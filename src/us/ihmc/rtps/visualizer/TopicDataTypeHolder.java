@@ -2,6 +2,7 @@ package us.ihmc.rtps.visualizer;
 
 import java.util.HashMap;
 
+import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import us.ihmc.pubsub.common.Guid;
 
@@ -33,18 +34,32 @@ public class TopicDataTypeHolder extends TreeItem<String>
       return participants.get(holder);
    }
 
-   public void addSubscriber(ParticipantHolder participantGuid, Guid guid)
+   public void addSubscriber(ParticipantHolder participantGuid, Guid guid, SubscriberAttributesHolder attributes)
    {
-      getHolder(participantGuid).addSubscriber(guid);
+      getHolder(participantGuid).addSubscriber(guid, attributes);
    }
 
-   public void addPublisher(ParticipantHolder participantGuid, Guid guid)
+   public void addPublisher(ParticipantHolder participantGuid, Guid guid, PublisherAttributesHolder attributes)
    {
-      getHolder(participantGuid).addPublisher(guid);
+      getHolder(participantGuid).addPublisher(guid, attributes);
    }
 
    public TreeItem<String> getRootNode()
    {
       return rootNode;
+   }
+
+   public void removeParticipant(ParticipantHolder participant)
+   {
+      TopicDataParticipantHolder holder = participants.remove(participant);
+      if(holder != null)
+      {
+         Platform.runLater(() -> rootNode.getChildren().remove(holder));
+      }
+   }
+   
+   public boolean isEmpty()
+   {
+      return participants.isEmpty();
    }
 }

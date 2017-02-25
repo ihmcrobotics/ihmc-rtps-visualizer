@@ -8,8 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="us.ihmc.rtps.visualizer.IHMCRTPSController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="us.ihmc.rtps.visualizer.IHMCRTPSController">
    <center>
       <SplitPane dividerPositions="0.333, 0.667" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <items>
@@ -26,11 +25,20 @@
             <VBox>
                <children>
                   <Label text="Participants" />
-                  <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-                     <content>
-                        <TreeView fx:id="participantTree" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </ScrollPane>
+                  <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" VBox.vgrow="ALWAYS">
+                    <items>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                           <content>
+                              <TreeView fx:id="participantTree" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
+                        </ScrollPane>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                           <content>
+                              <TreeView fx:id="participantDataTree" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
+                        </ScrollPane>
+                    </items>
+                  </SplitPane>
                </children>
             </VBox>
             <VBox>

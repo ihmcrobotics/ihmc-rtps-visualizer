@@ -16,16 +16,16 @@ public class TopicDataParticipantHolder extends TreeItem<String>
       setExpanded(true);
    }
 
-   public void addSubscriber(Guid guid)
+   public void addSubscriber(Guid guid, SubscriberAttributesHolder attributes)
    {
-      TreeItem<String> leaf = new TreeItem<String>("Sub: " + guid.toString());
+      TreeItem<String> leaf = new EndpointHolder("Sub: " + guid.toString(), attributes);
       subscribers.put(guid, leaf);
       getChildren().add(leaf);
    }
 
-   public void addPublisher(Guid guid)
+   public void addPublisher(Guid guid, PublisherAttributesHolder attributes)
    {
-      TreeItem<String> leaf = new TreeItem<String>("Pub " + guid.toString());
+      TreeItem<String> leaf = new EndpointHolder("Pub: " + guid.toString(), attributes);
       publishers.put(guid, leaf);
       getChildren().add(leaf);
    }

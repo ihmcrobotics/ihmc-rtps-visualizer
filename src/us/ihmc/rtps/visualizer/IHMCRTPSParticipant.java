@@ -3,6 +3,8 @@ package us.ihmc.rtps.visualizer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 import us.ihmc.pubsub.Domain;
@@ -25,30 +27,52 @@ import us.ihmc.rtps.impl.fastRTPS.ReaderQos;
 
 public class IHMCRTPSParticipant
 {
-   
+
    private final ReentrantLock lock = new ReentrantLock();
+
+   private final Guid myGUID;
    
    private final IHMCRTPSController controller;
    private final HashMap<Guid, ParticipantHolder> participants = new HashMap<>();
    private final HashMap<String, TopicHolder> topics = new HashMap<>();
-   
+
    private class ParticipantListenerImpl implements ParticipantListener
    {
 
       @Override
       public void onParticipantDiscovery(Participant participant, ParticipantDiscoveryInfo info)
       {
+         if(info.getGuid().equals(myGUID))
+            return;
          lock.lock();
-         if(info.getStatus() == DiscoveryStatus.DISCOVERED_RTPSPARTICIPANT)
+         if (info.getStatus() == DiscoveryStatus.DISCOVERED_RTPSPARTICIPANT)
          {
             ParticipantHolder holder = getParticipant(info.getGuid());
             holder.setName(info.getName());
-            lock.unlock();
          }
+         else if (info.getStatus() == DiscoveryStatus.REMOVED_RTPSPARTICIPANT)
+         {
+            ParticipantHolder removed = participants.remove(info.getGuid());
+            if(removed != null)
+            {
+               for(Iterator<Entry<String, TopicHolder>> it = topics.entrySet().iterator(); it.hasNext(); ) 
+               {
+                  Entry<String, TopicHolder> entry = it.next();
+                  entry.getValue().removeParticipant(removed);
+                  
+                  if(entry.getValue().isEmpty())
+                  {
+                     it.remove();
+                     controller.removeTopic(entry.getValue());
+                  }
+               }
+            }
+         }
+         lock.unlock();
       }
 
    }
-   
+
    private class PublisherEndpointDiscoveryListenerImpl implements PublisherEndpointDiscoveryListener
    {
 
@@ -57,15 +81,23 @@ public class IHMCRTPSParticipant
                                        Guid participantGuid, String typeName, String topicName, int userDefinedId, long typeMaxSerialized, TopicKind topicKind,
                                        WriterQosHolder<?> writerQosHolder)
       {
+         if(participantGuid.equals(myGUID))
+            return;
+         
          lock.lock();
          ParticipantHolder participantHolder = getParticipant(participantGuid);
          TopicHolder topicHolder = getTopic(topicName);
-         topicHolder.addPublisher(guid, participantHolder, typeName);
+
+         PublisherAttributesHolder attributes = new PublisherAttributesHolder(isAlive, guid, unicastLocatorList, multicastLocatorList, participantGuid,
+                                                                              typeName, topicName, userDefinedId, typeMaxSerialized, topicKind,
+                                                                              writerQosHolder);
+
+         topicHolder.addPublisher(guid, participantHolder, typeName, attributes);
          lock.unlock();
       }
-      
+
    }
-   
+
    private class SubscriberEndpointDiscoveryListenerImpl implements SubscriberEndpointDiscoveryListener
    {
 
@@ -74,55 +106,59 @@ public class IHMCRTPSParticipant
                                         ArrayList<Locator> multicastLocatorList, Guid participantGuid, String typeName, String topicName, int userDefinedId,
                                         TopicKind javaTopicKind, ReaderQosHolder<ReaderQos> readerQosHolder)
       {
+         if(participantGuid.equals(myGUID))
+            return;
+         
          lock.lock();
          ParticipantHolder participantHolder = getParticipant(participantGuid);
          TopicHolder topicHolder = getTopic(topicName);
-         topicHolder.addSubscriber(guid, participantHolder, typeName);
+         
+         SubscriberAttributesHolder attributes = new SubscriberAttributesHolder(isAlive, guid, expectsInlineQos, unicastLocatorList, multicastLocatorList, participantGuid, typeName, topicName, userDefinedId, javaTopicKind, readerQosHolder);
+         topicHolder.addSubscriber(guid, participantHolder, typeName, attributes);
          lock.unlock();
       }
-      
+
    }
-   
+
    private ParticipantHolder getParticipant(Guid guid)
    {
-      if(!participants.containsKey(guid))
+      if (!participants.containsKey(guid))
       {
          ParticipantHolder holder = new ParticipantHolder(guid);
          participants.put(guid, holder);
       }
-      
+
       return participants.get(guid);
    }
-   
-   
+
    private TopicHolder getTopic(String name)
    {
-      if(!topics.containsKey(name))
+      if (!topics.containsKey(name))
       {
          TopicHolder holder = new TopicHolder(name);
          topics.put(name, holder);
          controller.addTopic(holder);
       }
-      
+
       return topics.get(name);
    }
-   
 
    public IHMCRTPSParticipant(IHMCRTPSController controller) throws IOException
    {
       this.controller = controller;
-      
+
+      lock.lock();
       Domain domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
-      
+
       ParticipantAttributes<?> attributes = domain.createParticipantAttributes();
       attributes.setDomainId(1);
       attributes.setLeaseDuration(Time.Infinite);
       attributes.setName("IHMCRTPSVisualizer");
       Participant participant = domain.createParticipant(attributes, new ParticipantListenerImpl());
-      
-      
+      myGUID = participant.getGuid();
       participant.registerEndpointDiscoveryListeners(new PublisherEndpointDiscoveryListenerImpl(), new SubscriberEndpointDiscoveryListenerImpl());
 
+      lock.unlock();
    }
 
 }
