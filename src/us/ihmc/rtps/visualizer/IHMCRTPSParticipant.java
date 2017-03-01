@@ -13,6 +13,7 @@ import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
 import us.ihmc.pubsub.attributes.Locator;
 import us.ihmc.pubsub.attributes.ParticipantAttributes;
 import us.ihmc.pubsub.attributes.ReaderQosHolder;
+import us.ihmc.pubsub.attributes.SubscriberAttributes;
 import us.ihmc.pubsub.attributes.TopicAttributes.TopicKind;
 import us.ihmc.pubsub.attributes.WriterQosHolder;
 import us.ihmc.pubsub.common.DiscoveryStatus;
@@ -23,12 +24,15 @@ import us.ihmc.pubsub.participant.ParticipantDiscoveryInfo;
 import us.ihmc.pubsub.participant.ParticipantListener;
 import us.ihmc.pubsub.participant.PublisherEndpointDiscoveryListener;
 import us.ihmc.pubsub.participant.SubscriberEndpointDiscoveryListener;
+import us.ihmc.pubsub.subscriber.Subscriber;
+import us.ihmc.rtps.impl.fastRTPS.FastRTPSWriterQosHolder;
 import us.ihmc.rtps.impl.fastRTPS.ReaderQos;
 
 public class IHMCRTPSParticipant
 {
 
    private final ReentrantLock lock = new ReentrantLock();
+   private final ReentrantLock subScriberLock = new ReentrantLock();
 
    private final Guid myGUID;
    
@@ -36,6 +40,12 @@ public class IHMCRTPSParticipant
    private final HashMap<Guid, ParticipantHolder> participants = new HashMap<>();
    private final HashMap<String, TopicHolder> topics = new HashMap<>();
 
+   private Subscriber subscriber;
+
+   private final Domain domain;
+
+   private final Participant participant;
+   
    private class ParticipantListenerImpl implements ParticipantListener
    {
 
@@ -92,7 +102,7 @@ public class IHMCRTPSParticipant
                                                                               typeName, topicName, userDefinedId, typeMaxSerialized, topicKind,
                                                                               writerQosHolder);
 
-         topicHolder.addPublisher(guid, participantHolder, typeName, attributes);
+         topicHolder.addPublisher(guid, participantHolder, attributes);
          lock.unlock();
       }
 
@@ -104,7 +114,7 @@ public class IHMCRTPSParticipant
       @Override
       public void subscriberTopicChange(boolean isAlive, Guid guid, boolean expectsInlineQos, ArrayList<Locator> unicastLocatorList,
                                         ArrayList<Locator> multicastLocatorList, Guid participantGuid, String typeName, String topicName, int userDefinedId,
-                                        TopicKind javaTopicKind, ReaderQosHolder<ReaderQos> readerQosHolder)
+                                        TopicKind javaTopicKind, ReaderQosHolder<?> readerQosHolder)
       {
          if(participantGuid.equals(myGUID))
             return;
@@ -114,7 +124,7 @@ public class IHMCRTPSParticipant
          TopicHolder topicHolder = getTopic(topicName);
          
          SubscriberAttributesHolder attributes = new SubscriberAttributesHolder(isAlive, guid, expectsInlineQos, unicastLocatorList, multicastLocatorList, participantGuid, typeName, topicName, userDefinedId, javaTopicKind, readerQosHolder);
-         topicHolder.addSubscriber(guid, participantHolder, typeName, attributes);
+         topicHolder.addSubscriber(guid, participantHolder, attributes);
          lock.unlock();
       }
 
@@ -148,17 +158,43 @@ public class IHMCRTPSParticipant
       this.controller = controller;
 
       lock.lock();
-      Domain domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
+      controller.setParticipant(this);
+      domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
 
       ParticipantAttributes<?> attributes = domain.createParticipantAttributes();
       attributes.setDomainId(1);
       attributes.setLeaseDuration(Time.Infinite);
       attributes.setName("IHMCRTPSVisualizer");
-      Participant participant = domain.createParticipant(attributes, new ParticipantListenerImpl());
+      participant = domain.createParticipant(attributes, new ParticipantListenerImpl());
       myGUID = participant.getGuid();
       participant.registerEndpointDiscoveryListeners(new PublisherEndpointDiscoveryListenerImpl(), new SubscriberEndpointDiscoveryListenerImpl());
 
       lock.unlock();
+   }
+
+   public void unSubscribeFromTopic()
+   {
+      subScriberLock.lock();
+      if(subscriber != null)
+      {
+         domain.removeSubscriber(subscriber);
+      }
+      subScriberLock.unlock();
+   }
+
+   public void subscribeToTopic(TopicDataTypeHolder topicDataTypeHolder)
+   {
+      subScriberLock.lock();
+      unSubscribeFromTopic();
+      
+      SubscriberAttributes<?, ?> attr = domain.createSubscriberAttributes();
+      attr.getTopic().setTopicKind(TopicKind.NO_KEY);
+      
+      
+//      subscriber = domain.createSubscriber(participant, attr, listener)
+      
+      
+      subScriberLock.unlock();
    }
 
 }

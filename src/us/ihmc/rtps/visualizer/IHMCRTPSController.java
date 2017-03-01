@@ -8,13 +8,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
 public class IHMCRTPSController implements Initializable
 {
-
+   private IHMCRTPSParticipant participant;
    @FXML
    private TreeView<String> topicTree;
    @FXML
@@ -23,6 +24,9 @@ public class IHMCRTPSController implements Initializable
    private ListView<String> dataList;
    @FXML
    private TreeView<String> participantDataTree;
+   
+   @FXML
+   private Label qosPolicyLabel;
 
    private final ObservableList<String> dataObserverable = FXCollections.observableArrayList();
 
@@ -48,14 +52,7 @@ public class IHMCRTPSController implements Initializable
       topicTree.setRoot(topicRoot);
 
       topicTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue instanceof TopicDataTypeHolder)
-            {
-               participantTree.setRoot(((TopicDataTypeHolder) newValue).getRootNode());
-            }
-            else
-            {
-               participantTree.setRoot(null);
-            }
+            selectedTopic(newValue);
       });
 
       participantTree.setShowRoot(false);
@@ -70,6 +67,32 @@ public class IHMCRTPSController implements Initializable
          }
       });
 
+   }
+
+   private void selectedTopic(TreeItem<String> newValue)
+   {
+      if(participant != null)
+      {
+         if (newValue instanceof TopicDataTypeHolder)
+         {
+            TopicDataTypeHolder topicDataTypeHolder = (TopicDataTypeHolder) newValue;
+            participantTree.setRoot(topicDataTypeHolder.getRootNode());
+            participant.subscribeToTopic(topicDataTypeHolder);
+            System.out.println(qosPolicyLabel);
+            qosPolicyLabel.setText(topicDataTypeHolder.getTopicQosHolder().getError());
+         }
+         else
+         {
+            participantTree.setRoot(null);
+            participant.unSubscribeFromTopic();
+            qosPolicyLabel.setText("");
+         }         
+      }
+   }
+
+   public void setParticipant(IHMCRTPSParticipant ihmcrtpsParticipant)
+   {
+      this.participant = ihmcrtpsParticipant;
    }
 
 }

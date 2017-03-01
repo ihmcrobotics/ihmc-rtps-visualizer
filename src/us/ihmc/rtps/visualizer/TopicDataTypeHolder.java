@@ -4,21 +4,35 @@ import java.util.HashMap;
 
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import us.ihmc.pubsub.attributes.QosInterface;
 import us.ihmc.pubsub.common.Guid;
 
 public class TopicDataTypeHolder extends TreeItem<String>
 {
+   
+   private final static Image ERROR_IMAGE = new Image(TopicHolder.class.getResourceAsStream("error_icon_16x16.png"));
 
    private final TreeItem<String> rootNode;
    private final HashMap<ParticipantHolder, TopicDataParticipantHolder> participants = new HashMap<>();
 
-   public TopicDataTypeHolder(String name)
+   
+   private final String topicName;
+   private final String topicDataType;
+   
+   private final TopicQosHolder topicQosHolder = new TopicQosHolder();
+   
+   
+   public TopicDataTypeHolder(String name, String topicName, String topicDataType)
    {
       super(name);
       
       rootNode = new TreeItem<String>(name);
       rootNode.setExpanded(true);
       
+      this.topicName = topicName;
+      this.topicDataType = topicDataType;
       
    }
 
@@ -33,15 +47,25 @@ public class TopicDataTypeHolder extends TreeItem<String>
       }
       return participants.get(holder);
    }
+   
+   private void updateQos(QosInterface qosInterface)
+   {
+      if(!topicQosHolder.update(qosInterface))
+      {
+         Platform.runLater(() -> setGraphic(new ImageView(ERROR_IMAGE)));
+      }
+   }
 
    public void addSubscriber(ParticipantHolder participantGuid, Guid guid, SubscriberAttributesHolder attributes)
    {
       getHolder(participantGuid).addSubscriber(guid, attributes);
+      updateQos(attributes.getQosInterface());
    }
 
    public void addPublisher(ParticipantHolder participantGuid, Guid guid, PublisherAttributesHolder attributes)
    {
       getHolder(participantGuid).addPublisher(guid, attributes);
+      updateQos(attributes.getQosInterface());
    }
 
    public TreeItem<String> getRootNode()
@@ -62,4 +86,21 @@ public class TopicDataTypeHolder extends TreeItem<String>
    {
       return participants.isEmpty();
    }
+
+   public String getTopicName()
+   {
+      return topicName;
+   }
+
+   public String getTopicDataType()
+   {
+      return topicDataType;
+   }
+
+   public TopicQosHolder getTopicQosHolder()
+   {
+      return topicQosHolder;
+   }
+   
+   
 }

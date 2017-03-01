@@ -6,6 +6,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="us.ihmc.rtps.visualizer.IHMCRTPSController">
@@ -54,4 +55,11 @@
          </items>
       </SplitPane>
    </center>
+   <bottom>
+      <HBox prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="qosPolicyLabel" />
+         </children>
+      </HBox>
+   </bottom>
 </BorderPane>

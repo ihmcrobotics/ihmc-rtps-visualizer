@@ -8,13 +8,22 @@ import us.ihmc.pubsub.attributes.TopicAttributes.TopicKind;
 import us.ihmc.pubsub.attributes.WriterQosHolder;
 import us.ihmc.pubsub.common.Guid;
 
-public class PublisherAttributesHolder extends TreeItem<String>
+public class PublisherAttributesHolder extends TreeItem<String> implements TopicAttributesHolder
 {
+   private final String topicName;
+   private final String topicType;
+   private final WriterQosHolder<?> writerQosHolder;
+   
+   
+   
    public PublisherAttributesHolder(boolean isAlive, Guid guid, ArrayList<Locator> unicastLocatorList, ArrayList<Locator> multicastLocatorList,
                                     Guid participantGuid, String typeName, String topicName, int userDefinedId, long typeMaxSerialized, TopicKind topicKind,
                                     WriterQosHolder<?> writerQosHolder)
    {
       super("Root");
+      this.topicName = topicName;
+      this.topicType = typeName;
+      this.writerQosHolder = writerQosHolder;
       setExpanded(true);
       getChildren().add(new TreeItem<>("Topic name: " + topicName));
       getChildren().add(new TreeItem<>("Topic type: " + typeName));
@@ -40,5 +49,29 @@ public class PublisherAttributesHolder extends TreeItem<String>
       getChildren().add(new TreeItem<>("Max serialized size: " + typeMaxSerialized));
       getChildren().add(new TreeItem<>("Topic kind: " + topicKind));
       
+      TreeItem<String> qos = new TreeItem<>("QoS");
+      qos.getChildren().add(new TreeItem<>("Reliability: " + writerQosHolder.getReliabilityKind()));
+      getChildren().add(qos);
+   }
+
+
+   @Override
+   public String getTopicName()
+   {
+      return topicName;
+   }
+
+
+   @Override
+   public String getTopicType()
+   {
+      return topicType;
+   }
+
+
+   @Override
+   public WriterQosHolder<?> getQosInterface()
+   {
+      return writerQosHolder;
    }
 }

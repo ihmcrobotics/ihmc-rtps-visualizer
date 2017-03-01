@@ -6,10 +6,12 @@ import java.util.Map.Entry;
 
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
 import us.ihmc.pubsub.common.Guid;
 
 public class TopicHolder extends TreeItem<String>
 {
+   
    private final String name;
    
    private final HashMap<String, TopicDataTypeHolder> topicTypes = new HashMap<>();
@@ -22,26 +24,26 @@ public class TopicHolder extends TreeItem<String>
       setExpanded(true);
    }
    
-   private TopicDataTypeHolder getHolder(String topicDataType)
+   private TopicDataTypeHolder getHolder(TopicAttributesHolder attributesHolder)
    {
-      if(!topicTypes.containsKey(topicDataType))
+      if(!topicTypes.containsKey(attributesHolder.getTopicType()))
       {
-         TopicDataTypeHolder value = new TopicDataTypeHolder(topicDataType);
-         topicTypes.put(topicDataType, value);
+         TopicDataTypeHolder value = new TopicDataTypeHolder(attributesHolder.getTopicType(), attributesHolder.getTopicName(), attributesHolder.getTopicType());
+         topicTypes.put(attributesHolder.getTopicType(), value);
          Platform.runLater(() -> this.getChildren().add(value));
       }
-      return topicTypes.get(topicDataType);
+      return topicTypes.get(attributesHolder.getTopicType());
 
    }
    
-   public void addSubscriber(Guid guid, ParticipantHolder participantGuid, String topicDataType, SubscriberAttributesHolder attributes)
+   public void addSubscriber(Guid guid, ParticipantHolder participantGuid, SubscriberAttributesHolder attributes)
    {
-      getHolder(topicDataType).addSubscriber(participantGuid, guid, attributes);
+      getHolder(attributes).addSubscriber(participantGuid, guid, attributes);
    }
    
-   public void addPublisher(Guid guid, ParticipantHolder participantGuid, String topicDataType, PublisherAttributesHolder attributes)
+   public void addPublisher(Guid guid, ParticipantHolder participantGuid, PublisherAttributesHolder attributes)
    {
-      getHolder(topicDataType).addPublisher(participantGuid, guid, attributes);
+      getHolder(attributes).addPublisher(participantGuid, guid, attributes);
    }
    
    public void removeParticipant(ParticipantHolder participant)
