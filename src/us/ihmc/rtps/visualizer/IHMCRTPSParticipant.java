@@ -10,14 +10,20 @@ import java.util.concurrent.locks.ReentrantLock;
 import us.ihmc.pubsub.Domain;
 import us.ihmc.pubsub.DomainFactory;
 import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
+import us.ihmc.pubsub.TopicDataType;
+import us.ihmc.pubsub.attributes.DurabilityKind;
 import us.ihmc.pubsub.attributes.Locator;
 import us.ihmc.pubsub.attributes.ParticipantAttributes;
+import us.ihmc.pubsub.attributes.QosInterface;
 import us.ihmc.pubsub.attributes.ReaderQosHolder;
+import us.ihmc.pubsub.attributes.ReliabilityKind;
 import us.ihmc.pubsub.attributes.SubscriberAttributes;
 import us.ihmc.pubsub.attributes.TopicAttributes.TopicKind;
 import us.ihmc.pubsub.attributes.WriterQosHolder;
 import us.ihmc.pubsub.common.DiscoveryStatus;
 import us.ihmc.pubsub.common.Guid;
+import us.ihmc.pubsub.common.MatchingInfo;
+import us.ihmc.pubsub.common.SampleInfo;
 import us.ihmc.pubsub.common.Time;
 import us.ihmc.pubsub.participant.Participant;
 import us.ihmc.pubsub.participant.ParticipantDiscoveryInfo;
@@ -25,8 +31,7 @@ import us.ihmc.pubsub.participant.ParticipantListener;
 import us.ihmc.pubsub.participant.PublisherEndpointDiscoveryListener;
 import us.ihmc.pubsub.participant.SubscriberEndpointDiscoveryListener;
 import us.ihmc.pubsub.subscriber.Subscriber;
-import us.ihmc.rtps.impl.fastRTPS.FastRTPSWriterQosHolder;
-import us.ihmc.rtps.impl.fastRTPS.ReaderQos;
+import us.ihmc.pubsub.subscriber.SubscriberListener;
 
 public class IHMCRTPSParticipant
 {
@@ -45,6 +50,55 @@ public class IHMCRTPSParticipant
    private final Domain domain;
 
    private final Participant participant;
+   
+   private final TopicDataTypeProvider topicDataTypeProvider = new TopicDataTypeProvider();
+   
+   
+   private class SubscriberListenerImpl implements SubscriberListener
+   {
+      private final TopicDataType<?> topicDataType;
+      
+      private SubscriberListenerImpl(TopicDataType<?> topicDataType)
+      {
+         this.topicDataType = topicDataType;
+      }
+      
+      
+      @Override
+      public void onNewDataMessage(Subscriber subscriber)
+      {
+         subScriberLock.lock();
+         Object msg = topicDataType.createData();
+         SampleInfo info = new SampleInfo();
+         MessageHolder messageHolder;
+         try
+         {
+            if(subscriber.takeNextData(msg, info))
+            {
+               messageHolder = new MessageHolder(msg, info);
+            }
+            else
+            {
+               subScriberLock.unlock();
+               return;
+            }
+         }
+         catch (IOException e)
+         {
+            messageHolder = new MessageHolder(true, e.getMessage());
+         }
+         
+         controller.updateDataList(messageHolder);
+         
+         subScriberLock.unlock();
+      }
+
+      @Override
+      public void onSubscriptionMatched(Subscriber subscriber, MatchingInfo info)
+      {
+      }
+      
+   }
    
    private class ParticipantListenerImpl implements ParticipantListener
    {
@@ -178,6 +232,7 @@ public class IHMCRTPSParticipant
       if(subscriber != null)
       {
          domain.removeSubscriber(subscriber);
+         controller.clearDataList();
       }
       subScriberLock.unlock();
    }
@@ -187,12 +242,40 @@ public class IHMCRTPSParticipant
       subScriberLock.lock();
       unSubscribeFromTopic();
       
-      SubscriberAttributes<?, ?> attr = domain.createSubscriberAttributes();
-      attr.getTopic().setTopicKind(TopicKind.NO_KEY);
       
-      
-//      subscriber = domain.createSubscriber(participant, attr, listener)
-      
+      QosInterface topicQos = topicDataTypeHolder.getTopicQosHolder().getQosInterfaceForSubscriber();
+      if(topicQos != null)
+      {
+         SubscriberAttributes<?, ?> attr = domain.createSubscriberAttributes();
+         attr.getTopic().setTopicKind(TopicKind.NO_KEY);
+         attr.getTopic().setTopicDataType(topicDataTypeHolder.getTopicDataType());
+         attr.getTopic().setTopicName(topicDataTypeHolder.getTopicName());
+
+         attr.getQos().setReliabilityKind(ReliabilityKind.BEST_EFFORT); // Best effort always works
+         attr.getQos().setDurabilityKind(DurabilityKind.VOLATILE_DURABILITY_QOS); // Volatile always works
+         attr.getQos().setOwnershipPolicyKind(topicQos.getOwnershipPolicyKind()); // Ownership needs to match
+         
+         TopicDataType<?> topicDataType = domain.getRegisteredType(participant, topicDataTypeHolder.getTopicDataType()); 
+         
+         if(topicDataType == null)
+         {
+            topicDataType = topicDataTypeProvider.getTopicDataType(topicDataTypeHolder.getTopicDataType());
+            domain.registerType(participant, topicDataType);
+         }
+         else
+         {
+            System.out.println("ALREADY REGISTERED");
+         }
+         
+         try
+         {
+            subscriber = domain.createSubscriber(participant, attr, new SubscriberListenerImpl(topicDataType));
+         }
+         catch (IllegalArgumentException | IOException e)
+         {
+            e.printStackTrace();
+         }
+      }
       
       subScriberLock.unlock();
    }

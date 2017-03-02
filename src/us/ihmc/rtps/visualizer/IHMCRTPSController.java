@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
@@ -21,14 +22,16 @@ public class IHMCRTPSController implements Initializable
    @FXML
    private TreeView<String> participantTree;
    @FXML
-   private ListView<String> dataList;
+   private ListView<MessageHolder> dataList;
    @FXML
    private TreeView<String> participantDataTree;
-   
    @FXML
    private Label qosPolicyLabel;
+   
+   @FXML
+   private TextArea message;
 
-   private final ObservableList<String> dataObserverable = FXCollections.observableArrayList();
+   private final ObservableList<MessageHolder> dataObserverable = FXCollections.observableArrayList();
 
    private final TreeItem<String> topicRoot = new TreeItem<>("Root");
 
@@ -55,6 +58,10 @@ public class IHMCRTPSController implements Initializable
             selectedTopic(newValue);
       });
 
+      dataList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            selectedData(newValue);
+      });
+      
       participantTree.setShowRoot(false);
       participantTree.getSelectionModel().selectedItemProperty().addListener((observervable, oldValue, newValue) -> {
          if (newValue instanceof EndpointHolder)
@@ -69,6 +76,14 @@ public class IHMCRTPSController implements Initializable
 
    }
 
+   private void selectedData(MessageHolder newValue)
+   {
+      if(newValue != null)
+      {
+         message.setText(newValue.getData());
+      }
+   }
+
    private void selectedTopic(TreeItem<String> newValue)
    {
       if(participant != null)
@@ -78,7 +93,6 @@ public class IHMCRTPSController implements Initializable
             TopicDataTypeHolder topicDataTypeHolder = (TopicDataTypeHolder) newValue;
             participantTree.setRoot(topicDataTypeHolder.getRootNode());
             participant.subscribeToTopic(topicDataTypeHolder);
-            System.out.println(qosPolicyLabel);
             qosPolicyLabel.setText(topicDataTypeHolder.getTopicQosHolder().getError());
          }
          else
@@ -93,6 +107,16 @@ public class IHMCRTPSController implements Initializable
    public void setParticipant(IHMCRTPSParticipant ihmcrtpsParticipant)
    {
       this.participant = ihmcrtpsParticipant;
+   }
+
+   public void updateDataList(MessageHolder messageHolder)
+   {
+      Platform.runLater(() -> dataObserverable.add(messageHolder));
+   }
+   
+   public void clearDataList()
+   {
+      Platform.runLater(() -> dataObserverable.clear());
    }
 
 }
