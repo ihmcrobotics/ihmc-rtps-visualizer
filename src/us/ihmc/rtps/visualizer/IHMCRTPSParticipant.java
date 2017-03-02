@@ -1,5 +1,6 @@
 package us.ihmc.rtps.visualizer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -281,6 +282,11 @@ public class IHMCRTPSParticipant
       }
       
       subScriberLock.unlock();
+   }
+
+   public void loadBundle(File file)
+   {
+      topicDataTypeProvider.loadBundle(file);
    }
 
 }

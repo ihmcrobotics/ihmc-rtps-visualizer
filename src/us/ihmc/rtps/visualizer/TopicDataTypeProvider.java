@@ -11,17 +11,35 @@ import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import us.ihmc.idl.generated.Chat.ChatMessagePubSubType;
 import us.ihmc.pubsub.TopicDataType;
 
 public class TopicDataTypeProvider
 {
+   private static final int HEX_STRING_MAX_SIZE = 2048;
    private final HashMap<String, TopicDataType<?>> topicDataTypes = new HashMap<>();
    
    
    public TopicDataTypeProvider()
    {
-      loadBundle(new File("/home/jesper/.m2/repository/us/ihmc/IHMCPubSub/0.1.2/IHMCPubSub-0.1.2.jar"));
+      String bundles = System.getProperty("dataTypeBundles");
+      if(bundles != null)
+      {
+         String[] bundleArray = bundles.split(";");
+         for(String bundle : bundleArray)
+         {
+            File bundleFile = new File(bundle);
+            if(bundleFile.exists())
+            {
+               System.out.println("Loading topic data type bundle " + bundle);
+               loadBundle(bundleFile);
+            }
+            else
+            {
+               System.err.println("Cannot find topic data type bundle " + bundle);
+            }
+         }
+      }
+      
    }
    
    
@@ -85,6 +103,6 @@ public class TopicDataTypeProvider
          return topicDataTypes.get(topicType);
       }
       
-      return new HexStringTopicDataType(1024, topicType, ByteOrder.nativeOrder());
+      return new HexStringTopicDataType(HEX_STRING_MAX_SIZE, topicType, ByteOrder.nativeOrder());
    }
 }
