@@ -1,12 +1,20 @@
 package us.ihmc.rtps.visualizer;
 
-import java.io.StringWriter;
 import java.util.Arrays;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
 import us.ihmc.pubsub.common.SampleInfo;
 
 public class MessageHolder
 {
+   private final SimpleStringProperty timestamp = new SimpleStringProperty();
+   private final SimpleLongProperty sequenceNumber = new SimpleLongProperty();
+   private final SimpleIntegerProperty bytes = new SimpleIntegerProperty();
+   private final SimpleStringProperty changeKind = new SimpleStringProperty();
+   
+   
    private final boolean valid;
    private final String stackTrace;
    private final Object msg;
@@ -18,6 +26,11 @@ public class MessageHolder
       this.info = info;
       this.valid = true;
       stackTrace = "";
+      
+      this.timestamp.set(info.getSourceTimestamp().toString());
+      this.sequenceNumber.set(info.getSampleIdentity().getSequenceNumber().get());
+      this.bytes.set(info.getDataLength());
+      this.changeKind.set(info.getSampleKind().toString());
    }
 
    public MessageHolder(boolean invalid, String stackTrace)
@@ -31,6 +44,9 @@ public class MessageHolder
       this.info = null;
       this.valid = false;
       this.stackTrace = stackTrace;
+      
+      this.timestamp.set("<Corrupted message>");      
+      
    }
 
    public String getData()
@@ -42,6 +58,10 @@ public class MessageHolder
          builder.append(info.getSampleKind());
          builder.append('\n');
 
+         builder.append("Data length: ");
+         builder.append(info.getDataLength());
+         builder.append('\n');
+         
          builder.append("Ownership Strength: ");
          builder.append(info.getOwnershipStrength());
          builder.append('\n');
@@ -50,15 +70,20 @@ public class MessageHolder
          builder.append(info.getSourceTimestamp());
          builder.append('\n');
          
-         builder.append("Instance handle: ");
-         builder.append(Arrays.toString(info.getInstanceHandle().getValue()));
+         builder.append("Key: ");
+         if(info.getInstanceHandle().isDefined())
+         {
+            builder.append(Arrays.toString(info.getInstanceHandle().getValue()));
+         }
+         else
+         {
+            builder.append("NO_KEY");
+         }
          builder.append('\n');
          
          builder.append("Sample identity: ");
          builder.append("\n\tSequence number: ");
-         builder.append(info.getSampleIdentity().getSequenceNumber().getHigh());
-         builder.append('.');
-         builder.append(info.getSampleIdentity().getSequenceNumber().getLow());
+         builder.append(info.getSampleIdentity().getSequenceNumber().get());
          builder.append("\n\tGUID: ");
          builder.append(info.getSampleIdentity().getGuid());
          builder.append('\n');
@@ -82,17 +107,27 @@ public class MessageHolder
          return stackTrace;
       }
    }
-   
-   @Override
-   public String toString()
+
+   public String getTimestamp()
    {
-      if (valid)
-      {
-         return "[" + info.getSourceTimestamp() + "] " + info.getSampleKind();
-      }
-      else
-      {
-         return "<Corrupted Message>";
-      }
+      return timestamp.get();
    }
+
+   public long getSequenceNumber()
+   {
+      return sequenceNumber.get();
+   }
+
+   public int getBytes()
+   {
+      return bytes.get();
+   }
+
+   public String getChangeKind()
+   {
+      return changeKind.get();
+   }
+   
+   
+   
 }

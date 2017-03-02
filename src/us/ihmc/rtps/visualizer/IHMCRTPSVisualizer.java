@@ -27,7 +27,7 @@ public class IHMCRTPSVisualizer extends Application
       
       
       
-      Scene scene = new Scene(root, 800, 600);
+      Scene scene = new Scene(root, 1024, 720);
       stage.setTitle("IHMC RTPS Visualizer");
       stage.setScene(scene);
       stage.show();

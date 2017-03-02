@@ -251,7 +251,14 @@ public class IHMCRTPSParticipant
          attr.getTopic().setTopicDataType(topicDataTypeHolder.getTopicDataType());
          attr.getTopic().setTopicName(topicDataTypeHolder.getTopicName());
 
-         attr.getQos().setReliabilityKind(ReliabilityKind.BEST_EFFORT); // Best effort always works
+         if(topicQos.getReliabilityKind() == ReliabilityKind.RELIABLE)
+         {
+            attr.getQos().setReliabilityKind(ReliabilityKind.RELIABLE);
+         }
+         else
+         {
+            attr.getQos().setReliabilityKind(ReliabilityKind.BEST_EFFORT); // Best effort always works
+         }
          attr.getQos().setDurabilityKind(DurabilityKind.VOLATILE_DURABILITY_QOS); // Volatile always works
          attr.getQos().setOwnershipPolicyKind(topicQos.getOwnershipPolicyKind()); // Ownership needs to match
          
@@ -261,10 +268,6 @@ public class IHMCRTPSParticipant
          {
             topicDataType = topicDataTypeProvider.getTopicDataType(topicDataTypeHolder.getTopicDataType());
             domain.registerType(participant, topicDataType);
-         }
-         else
-         {
-            System.out.println("ALREADY REGISTERED");
          }
          
          try

@@ -10,9 +10,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class IHMCRTPSController implements Initializable
 {
@@ -22,7 +25,18 @@ public class IHMCRTPSController implements Initializable
    @FXML
    private TreeView<String> participantTree;
    @FXML
-   private ListView<MessageHolder> dataList;
+   private TableView<MessageHolder> dataList;
+   
+   @FXML
+   private TableColumn<MessageHolder, String> timestamp;
+   @FXML
+   private TableColumn<MessageHolder, String> sequence;
+   @FXML
+   private TableColumn<MessageHolder, String> bytes;
+   @FXML
+   private TableColumn<MessageHolder, String> change;
+   
+   
    @FXML
    private TreeView<String> participantDataTree;
    @FXML
@@ -48,6 +62,11 @@ public class IHMCRTPSController implements Initializable
    @Override
    public void initialize(URL location, ResourceBundle resources)
    {
+      timestamp.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
+      sequence.setCellValueFactory(new PropertyValueFactory<>("sequenceNumber"));
+      bytes.setCellValueFactory(new PropertyValueFactory<>("bytes"));
+      change.setCellValueFactory(new PropertyValueFactory<>("changeKind"));
+      
       dataList.setItems(dataObserverable);
 
       participantDataTree.setShowRoot(false);
@@ -81,6 +100,10 @@ public class IHMCRTPSController implements Initializable
       if(newValue != null)
       {
          message.setText(newValue.getData());
+      }
+      else
+      {
+         message.setText("");
       }
    }
 

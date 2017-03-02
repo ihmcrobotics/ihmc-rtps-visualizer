@@ -2,10 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -74,7 +75,14 @@
                         <Label text="Data" />
                         <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                            <content>
-                              <ListView fx:id="dataList" prefHeight="200.0" prefWidth="200.0" />
+                              <TableView fx:id="dataList" prefHeight="200.0" prefWidth="200.0">
+                                <columns>
+                                  <TableColumn fx:id="timestamp" editable="false" prefWidth="120.0" sortable="false" text="Timestamp" />
+                                  <TableColumn fx:id="sequence" editable="false" prefWidth="75.0" sortable="false" text="Sequence  #" />
+                                    <TableColumn fx:id="bytes" editable="false" prefWidth="75.0" sortable="false" text="Bytes" />
+                                    <TableColumn fx:id="change" editable="false" prefWidth="75.0" sortable="false" text="Change kind" />
+                                </columns>
+                              </TableView>
                            </content>
                         </ScrollPane>
                      </children>
