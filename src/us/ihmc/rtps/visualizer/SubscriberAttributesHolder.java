@@ -51,6 +51,8 @@ public class SubscriberAttributesHolder extends TreeItem<String> implements Topi
       
       TreeItem<String> qos = new TreeItem<>("QoS");
       qos.getChildren().add(new TreeItem<>("Reliability: " + readerQosHolder.getReliabilityKind()));
+      qos.getChildren().add(new TreeItem<>("Partitions: " + readerQosHolder.getPartitions()));
+      qos.setExpanded(true);
       getChildren().add(qos);
    }
 

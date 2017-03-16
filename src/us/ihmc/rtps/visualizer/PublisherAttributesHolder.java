@@ -51,6 +51,8 @@ public class PublisherAttributesHolder extends TreeItem<String> implements Topic
       
       TreeItem<String> qos = new TreeItem<>("QoS");
       qos.getChildren().add(new TreeItem<>("Reliability: " + writerQosHolder.getReliabilityKind()));
+      qos.getChildren().add(new TreeItem<>("Partitions: " + writerQosHolder.getPartitions()));
+      qos.setExpanded(true);
       getChildren().add(qos);
    }
 

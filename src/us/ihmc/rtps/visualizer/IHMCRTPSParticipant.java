@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -44,7 +45,8 @@ public class IHMCRTPSParticipant
    
    private final IHMCRTPSController controller;
    private final HashMap<Guid, ParticipantHolder> participants = new HashMap<>();
-   private final HashMap<String, TopicHolder> topics = new HashMap<>();
+   private final PartitionHolder defaultPartition = new PartitionHolder();
+   private final HashMap<String, PartitionHolder> partitions = new HashMap<>();
 
    private Subscriber subscriber;
 
@@ -120,17 +122,19 @@ public class IHMCRTPSParticipant
             ParticipantHolder removed = participants.remove(info.getGuid());
             if(removed != null)
             {
-               for(Iterator<Entry<String, TopicHolder>> it = topics.entrySet().iterator(); it.hasNext(); ) 
+               for(Iterator<Entry<String, PartitionHolder>> it = partitions.entrySet().iterator(); it.hasNext(); ) 
                {
-                  Entry<String, TopicHolder> entry = it.next();
+                  Entry<String, PartitionHolder> entry = it.next();
                   entry.getValue().removeParticipant(removed);
                   
                   if(entry.getValue().isEmpty())
                   {
                      it.remove();
-                     controller.removeTopic(entry.getValue());
+                     controller.removePartition(entry.getValue());
                   }
                }
+               
+               defaultPartition.removeParticipant(removed);
             }
          }
          lock.unlock();
@@ -151,13 +155,21 @@ public class IHMCRTPSParticipant
          
          lock.lock();
          ParticipantHolder participantHolder = getParticipant(participantGuid);
-         TopicHolder topicHolder = getTopic(topicName);
-
          PublisherAttributesHolder attributes = new PublisherAttributesHolder(isAlive, guid, unicastLocatorList, multicastLocatorList, participantGuid,
                                                                               typeName, topicName, userDefinedId, typeMaxSerialized, topicKind,
                                                                               writerQosHolder);
-
-         topicHolder.addPublisher(guid, participantHolder, attributes);
+         
+         List<String> topicPartitions = writerQosHolder.getPartitions();
+         if(topicPartitions.isEmpty())
+         {
+            defaultPartition.addPublisher(guid, participantHolder, attributes);
+         }
+         
+         for(String partition : topicPartitions)
+         {
+            PartitionHolder partitionHolder = getPartition(partition);
+            partitionHolder.addPublisher(guid, participantHolder, attributes);
+         }
          lock.unlock();
       }
 
@@ -176,10 +188,21 @@ public class IHMCRTPSParticipant
          
          lock.lock();
          ParticipantHolder participantHolder = getParticipant(participantGuid);
-         TopicHolder topicHolder = getTopic(topicName);
-         
          SubscriberAttributesHolder attributes = new SubscriberAttributesHolder(isAlive, guid, expectsInlineQos, unicastLocatorList, multicastLocatorList, participantGuid, typeName, topicName, userDefinedId, javaTopicKind, readerQosHolder);
-         topicHolder.addSubscriber(guid, participantHolder, attributes);
+         
+         List<String> topicPartitions = readerQosHolder.getPartitions();
+         if(topicPartitions.isEmpty())
+         {
+            defaultPartition.addSubscriber(guid, participantHolder, attributes);
+         }
+         else
+         {
+            for(String partition : topicPartitions)
+            {
+               PartitionHolder partitionHolder = getPartition(partition);
+               partitionHolder.addSubscriber(guid, participantHolder, attributes);
+            }
+         }
          lock.unlock();
       }
 
@@ -195,17 +218,16 @@ public class IHMCRTPSParticipant
 
       return participants.get(guid);
    }
-
-   private TopicHolder getTopic(String name)
+   
+   private PartitionHolder getPartition(String name)
    {
-      if (!topics.containsKey(name))
+      if(!partitions.containsKey(name))
       {
-         TopicHolder holder = new TopicHolder(name);
-         topics.put(name, holder);
-         controller.addTopic(holder);
+         PartitionHolder holder = new PartitionHolder(name);
+         partitions.put(name, holder);
+         controller.addPartition(holder);
       }
-
-      return topics.get(name);
+      return partitions.get(name);
    }
 
    public IHMCRTPSParticipant(IHMCRTPSController controller) throws IOException
@@ -214,6 +236,7 @@ public class IHMCRTPSParticipant
 
       lock.lock();
       controller.setParticipant(this);
+      controller.addPartition(defaultPartition);
       domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
 
       ParticipantAttributes<?> attributes = domain.createParticipantAttributes();
@@ -263,6 +286,11 @@ public class IHMCRTPSParticipant
          attr.getQos().setDurabilityKind(DurabilityKind.VOLATILE_DURABILITY_QOS); // Volatile always works
          attr.getQos().setOwnershipPolicyKind(topicQos.getOwnershipPolicyKind()); // Ownership needs to match
          
+         if(topicDataTypeHolder.getPartition() != null)
+         {
+            attr.getQos().addPartition(topicDataTypeHolder.getPartition());
+         }
+         
          TopicDataType<?> topicDataType = domain.getRegisteredType(participant, topicDataTypeHolder.getTopicDataType()); 
          
          if(topicDataType == null)
@@ -286,7 +314,25 @@ public class IHMCRTPSParticipant
 
    public void loadBundle(File file)
    {
-      topicDataTypeProvider.loadBundle(file);
+      List<String> registered = topicDataTypeProvider.loadBundle(file);
+      subScriberLock.lock();
+      for(String topicType : registered)
+      {
+         TopicDataType<?> topicDataType = domain.getRegisteredType(participant, topicType);
+         if(topicDataType != null)
+         {
+            try
+            {
+               domain.unregisterType(participant, topicType);
+            }
+            catch (IOException e)
+            {
+               System.err.println("Cannot unregister type " + topicType);
+            }
+         }
+         
+      }
+      subScriberLock.unlock();
    }
 
 }

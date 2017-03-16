@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -43,8 +44,9 @@ public class TopicDataTypeProvider
    }
    
    
-   public void loadBundle(File bundle)
+   public List<String> loadBundle(File bundle)
    {
+      ArrayList<String> registeredTopics = new ArrayList<>();
       try
       {
          ArrayList<String> classesInBundle = new ArrayList<>();
@@ -78,6 +80,7 @@ public class TopicDataTypeProvider
                {
                   TopicDataType<?> dataType = (TopicDataType<?>) clazz.newInstance();
                   topicDataTypes.put(dataType.getName(), dataType);
+                  registeredTopics.add(dataType.getName());
                   System.out.println("Registered topic data type: " + dataType.getName());
                }
             }
@@ -87,11 +90,13 @@ public class TopicDataTypeProvider
             }
          }
          
+         
       }
       catch (IOException e)
       {
          e.printStackTrace();
       }
+      return registeredTopics;
       
    }
    

@@ -6,21 +6,22 @@ import java.util.Map.Entry;
 
 import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
-import javafx.scene.image.Image;
 import us.ihmc.pubsub.common.Guid;
 
 public class TopicHolder extends TreeItem<String>
 {
    
    private final String name;
+   private final String partition;
    
    private final HashMap<String, TopicDataTypeHolder> topicTypes = new HashMap<>();
    
    
-   public TopicHolder(String name)
+   public TopicHolder(String name, String partition)
    {
       super(name);
       this.name = name;
+      this.partition = partition;
       setExpanded(true);
    }
    
@@ -28,7 +29,7 @@ public class TopicHolder extends TreeItem<String>
    {
       if(!topicTypes.containsKey(attributesHolder.getTopicType()))
       {
-         TopicDataTypeHolder value = new TopicDataTypeHolder(attributesHolder.getTopicType(), attributesHolder.getTopicName(), attributesHolder.getTopicType());
+         TopicDataTypeHolder value = new TopicDataTypeHolder(attributesHolder.getTopicType(), attributesHolder.getTopicName(), attributesHolder.getTopicType(), partition);
          topicTypes.put(attributesHolder.getTopicType(), value);
          Platform.runLater(() -> this.getChildren().add(value));
       }

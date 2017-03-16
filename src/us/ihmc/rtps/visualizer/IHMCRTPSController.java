@@ -73,14 +73,14 @@ public class IHMCRTPSController implements Initializable
 
    private final TreeItem<String> topicRoot = new TreeItem<>("Root");
 
-   public void addTopic(TopicHolder topic)
+   public void addPartition(PartitionHolder partition)
    {
-      Platform.runLater(() -> topicRoot.getChildren().add(topic));
+      Platform.runLater(() -> topicRoot.getChildren().add(partition));
    }
 
-   public void removeTopic(TopicHolder topic)
+   public void removePartition(PartitionHolder partition)
    {
-      Platform.runLater(() -> topicRoot.getChildren().remove(topic));
+      Platform.runLater(() -> topicRoot.getChildren().remove(partition));
    }
 
    @Override

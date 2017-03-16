@@ -20,11 +20,12 @@ public class TopicDataTypeHolder extends TreeItem<String>
    
    private final String topicName;
    private final String topicDataType;
+   private final String partition;
    
    private final TopicQosHolder topicQosHolder = new TopicQosHolder();
    
    
-   public TopicDataTypeHolder(String name, String topicName, String topicDataType)
+   public TopicDataTypeHolder(String name, String topicName, String topicDataType, String partition)
    {
       super(name);
       
@@ -33,7 +34,7 @@ public class TopicDataTypeHolder extends TreeItem<String>
       
       this.topicName = topicName;
       this.topicDataType = topicDataType;
-      
+      this.partition = partition;
    }
 
    private TopicDataParticipantHolder getHolder(ParticipantHolder holder)
@@ -100,6 +101,11 @@ public class TopicDataTypeHolder extends TreeItem<String>
    public TopicQosHolder getTopicQosHolder()
    {
       return topicQosHolder;
+   }
+
+   public String getPartition()
+   {
+      return partition;
    }
    
    
