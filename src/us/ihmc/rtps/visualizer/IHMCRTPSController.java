@@ -1,6 +1,7 @@
 package us.ihmc.rtps.visualizer;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -10,7 +11,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -44,6 +48,11 @@ public class IHMCRTPSController implements Initializable
    @FXML
    private TableColumn<MessageHolder, String> change;
    
+   @FXML
+   private Spinner<Integer> domainSelector;
+   @FXML
+   private Button connect;
+   
    
    @FXML
    private TreeView<String> participantDataTree;
@@ -68,6 +77,29 @@ public class IHMCRTPSController implements Initializable
       }
    }
    
+   @FXML
+   private void connect(ActionEvent event)
+   {
+      if(domainSelector.isDisable())
+      {
+         participant.disconnect();
+         connect.setText("Connect");
+         domainSelector.setDisable(false);
+      }
+      else
+      {
+         domainSelector.setDisable(true);
+         connect.setText("Disconnect");
+         try
+         {
+            participant.connect(domainSelector.getValue().intValue());
+         }
+         catch (IOException e)
+         {
+            e.printStackTrace();
+         }
+      }
+   }
    
    private final ObservableList<MessageHolder> dataObserverable = FXCollections.observableArrayList();
 
@@ -86,6 +118,8 @@ public class IHMCRTPSController implements Initializable
    @Override
    public void initialize(URL location, ResourceBundle resources)
    {
+      domainSelector.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 232));
+      
       timestamp.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
       sequence.setCellValueFactory(new PropertyValueFactory<>("sequenceNumber"));
       bytes.setCellValueFactory(new PropertyValueFactory<>("bytes"));

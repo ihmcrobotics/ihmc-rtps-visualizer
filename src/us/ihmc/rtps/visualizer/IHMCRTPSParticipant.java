@@ -41,7 +41,7 @@ public class IHMCRTPSParticipant
    private final ReentrantLock lock = new ReentrantLock();
    private final ReentrantLock subScriberLock = new ReentrantLock();
 
-   private final Guid myGUID;
+   private Guid myGUID;
    
    private final IHMCRTPSController controller;
    private final HashMap<Guid, ParticipantHolder> participants = new HashMap<>();
@@ -52,7 +52,7 @@ public class IHMCRTPSParticipant
 
    private final Domain domain;
 
-   private final Participant participant;
+   private Participant participant;
    
    private final TopicDataTypeProvider topicDataTypeProvider = new TopicDataTypeProvider();
    
@@ -122,23 +122,13 @@ public class IHMCRTPSParticipant
             ParticipantHolder removed = participants.remove(info.getGuid());
             if(removed != null)
             {
-               for(Iterator<Entry<String, PartitionHolder>> it = partitions.entrySet().iterator(); it.hasNext(); ) 
-               {
-                  Entry<String, PartitionHolder> entry = it.next();
-                  entry.getValue().removeParticipant(removed);
-                  
-                  if(entry.getValue().isEmpty())
-                  {
-                     it.remove();
-                     controller.removePartition(entry.getValue());
-                  }
-               }
-               
-               defaultPartition.removeParticipant(removed);
+               removeParticipant(removed);
             }
          }
          lock.unlock();
       }
+
+      
 
    }
 
@@ -208,6 +198,23 @@ public class IHMCRTPSParticipant
 
    }
 
+   private void removeParticipant(ParticipantHolder removed)
+   {
+      for(Iterator<Entry<String, PartitionHolder>> it = partitions.entrySet().iterator(); it.hasNext(); ) 
+      {
+         Entry<String, PartitionHolder> entry = it.next();
+         entry.getValue().removeParticipant(removed);
+         
+         if(entry.getValue().isEmpty())
+         {
+            it.remove();
+            controller.removePartition(entry.getValue());
+         }
+      }
+      
+      defaultPartition.removeParticipant(removed);
+   }
+   
    private ParticipantHolder getParticipant(Guid guid)
    {
       if (!participants.containsKey(guid))
@@ -233,20 +240,43 @@ public class IHMCRTPSParticipant
    public IHMCRTPSParticipant(IHMCRTPSController controller) throws IOException
    {
       this.controller = controller;
-
-      lock.lock();
+      domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
       controller.setParticipant(this);
       controller.addPartition(defaultPartition);
-      domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
 
+   }
+   
+   public void connect(int domainID) throws IOException
+   {
+      lock.lock();
+      
       ParticipantAttributes<?> attributes = domain.createParticipantAttributes();
-      attributes.setDomainId(1);
+      attributes.setDomainId(domainID);
       attributes.setLeaseDuration(Time.Infinite);
       attributes.setName("IHMCRTPSVisualizer");
       participant = domain.createParticipant(attributes, new ParticipantListenerImpl());
       myGUID = participant.getGuid();
       participant.registerEndpointDiscoveryListeners(new PublisherEndpointDiscoveryListenerImpl(), new SubscriberEndpointDiscoveryListenerImpl());
-
+      
+      lock.unlock();
+   }
+   
+   public void disconnect()
+   {
+      lock.lock();
+      subScriberLock.lock();
+      
+      unSubscribeFromTopic();
+      
+      for(ParticipantHolder removed : participants.values())
+      {
+         removeParticipant(removed);
+      }
+      
+      domain.removeParticipant(participant);
+      participant = null;
+      myGUID = null;
+      subScriberLock.unlock();
       lock.unlock();
    }
 
@@ -264,6 +294,13 @@ public class IHMCRTPSParticipant
    public void subscribeToTopic(TopicDataTypeHolder topicDataTypeHolder)
    {
       subScriberLock.lock();
+      
+      if(participant == null)
+      {
+         subScriberLock.unlock();
+         return;
+      }
+      
       unSubscribeFromTopic();
       
       
