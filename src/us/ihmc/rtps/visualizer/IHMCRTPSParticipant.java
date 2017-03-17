@@ -320,7 +320,15 @@ public class IHMCRTPSParticipant
          {
             attr.getQos().setReliabilityKind(ReliabilityKind.BEST_EFFORT); // Best effort always works
          }
-         attr.getQos().setDurabilityKind(DurabilityKind.VOLATILE_DURABILITY_QOS); // Volatile always works
+         if(topicQos.getDurabilityKind() == DurabilityKind.VOLATILE_DURABILITY_QOS)
+         {
+            attr.getQos().setDurabilityKind(DurabilityKind.VOLATILE_DURABILITY_QOS); // Volatile always works            
+         }
+         else
+         {
+            attr.getQos().setDurabilityKind(DurabilityKind.TRANSIENT_LOCAL_DURABILITY_QOS);
+         }
+         
          attr.getQos().setOwnershipPolicyKind(topicQos.getOwnershipPolicyKind()); // Ownership needs to match
          
          if(topicDataTypeHolder.getPartition() != null)
