@@ -138,7 +138,7 @@ public class IHMCRTPSParticipant
       @Override
       public void publisherTopicChange(boolean isAlive, Guid guid, ArrayList<Locator> unicastLocatorList, ArrayList<Locator> multicastLocatorList,
                                        Guid participantGuid, String typeName, String topicName, int userDefinedId, long typeMaxSerialized, TopicKind topicKind,
-                                       WriterQosHolder<?> writerQosHolder)
+                                       WriterQosHolder writerQosHolder)
       {
          if(participantGuid.equals(myGUID))
             return;
@@ -171,7 +171,7 @@ public class IHMCRTPSParticipant
       @Override
       public void subscriberTopicChange(boolean isAlive, Guid guid, boolean expectsInlineQos, ArrayList<Locator> unicastLocatorList,
                                         ArrayList<Locator> multicastLocatorList, Guid participantGuid, String typeName, String topicName, int userDefinedId,
-                                        TopicKind javaTopicKind, ReaderQosHolder<?> readerQosHolder)
+                                        TopicKind javaTopicKind, ReaderQosHolder readerQosHolder)
       {
          if(participantGuid.equals(myGUID))
             return;
@@ -250,7 +250,7 @@ public class IHMCRTPSParticipant
    {
       lock.lock();
       
-      ParticipantAttributes<?> attributes = domain.createParticipantAttributes();
+      ParticipantAttributes attributes = domain.createParticipantAttributes();
       attributes.setDomainId(domainID);
       attributes.setLeaseDuration(Time.Infinite);
       attributes.setName("IHMCRTPSVisualizer");
@@ -307,7 +307,7 @@ public class IHMCRTPSParticipant
       QosInterface topicQos = topicDataTypeHolder.getTopicQosHolder().getQosInterfaceForSubscriber();
       if(topicQos != null)
       {
-         SubscriberAttributes<?, ?> attr = domain.createSubscriberAttributes();
+         SubscriberAttributes attr = domain.createSubscriberAttributes();
          attr.getTopic().setTopicKind(TopicKind.NO_KEY);
          attr.getTopic().setTopicDataType(topicDataTypeHolder.getTopicDataType());
          attr.getTopic().setTopicName(topicDataTypeHolder.getTopicName());

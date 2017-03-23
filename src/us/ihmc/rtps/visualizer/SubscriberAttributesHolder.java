@@ -12,13 +12,13 @@ public class SubscriberAttributesHolder extends TreeItem<String> implements Topi
 {
    private final String topicName;
    private final String topicType;
-   private final ReaderQosHolder<?> readerQosHolder;
+   private final ReaderQosHolder readerQosHolder;
    
    
    
    public SubscriberAttributesHolder(boolean isAlive, Guid guid, boolean expectsInlineQos, ArrayList<Locator> unicastLocatorList,
                                      ArrayList<Locator> multicastLocatorList, Guid participantGuid, String typeName, String topicName, int userDefinedId,
-                                     TopicKind javaTopicKind, ReaderQosHolder<?> readerQosHolder)
+                                     TopicKind javaTopicKind, ReaderQosHolder readerQosHolder)
    {
       super("Root");
       this.topicName = topicName;
@@ -75,7 +75,7 @@ public class SubscriberAttributesHolder extends TreeItem<String> implements Topi
 
 
    @Override
-   public ReaderQosHolder<?> getQosInterface()
+   public ReaderQosHolder getQosInterface()
    {
       return readerQosHolder;
    }

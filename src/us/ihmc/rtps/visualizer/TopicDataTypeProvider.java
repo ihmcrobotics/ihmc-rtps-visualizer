@@ -16,7 +16,7 @@ import us.ihmc.pubsub.TopicDataType;
 
 public class TopicDataTypeProvider
 {
-   private static final int HEX_STRING_MAX_SIZE = 2048;
+   private static final int HEX_STRING_MAX_SIZE = 66560;
    private final HashMap<String, TopicDataType<?>> topicDataTypes = new HashMap<>();
    
    

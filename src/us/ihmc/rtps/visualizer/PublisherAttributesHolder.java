@@ -12,13 +12,13 @@ public class PublisherAttributesHolder extends TreeItem<String> implements Topic
 {
    private final String topicName;
    private final String topicType;
-   private final WriterQosHolder<?> writerQosHolder;
+   private final WriterQosHolder writerQosHolder;
    
    
    
    public PublisherAttributesHolder(boolean isAlive, Guid guid, ArrayList<Locator> unicastLocatorList, ArrayList<Locator> multicastLocatorList,
                                     Guid participantGuid, String typeName, String topicName, int userDefinedId, long typeMaxSerialized, TopicKind topicKind,
-                                    WriterQosHolder<?> writerQosHolder)
+                                    WriterQosHolder writerQosHolder)
    {
       super("Root");
       this.topicName = topicName;
@@ -72,7 +72,7 @@ public class PublisherAttributesHolder extends TreeItem<String> implements Topic
 
 
    @Override
-   public WriterQosHolder<?> getQosInterface()
+   public WriterQosHolder getQosInterface()
    {
       return writerQosHolder;
    }
