@@ -3,10 +3,10 @@
 A visualizer for traffic in a RTPS domain. This visualizer is implemented as an active participant, and will connect to the domain and subscribe to topics.
 
 ## Toolchain
-- [https://github.com/ihmcrobotics/ihmc-pub-sub](IHMC Pub/Sub): IHMC Pub/Sub RTPS library
-- [https://github.com/ihmcrobotics/ihmc-pub-sub-generator](IHMC Pub/Sub generator): Gradle plugin and standalone application to generate java classes from .idl messages.
-- [https://github.com/ihmcrobotics/ihmc-rtps-visualizer](IHMC RTPS Visualizer): GUI to display partitions, topics, participants, subscribers, publisher and publisher data on a RTPS domain.
-- [https://github.com/ihmcrobotics/ihmc-pub-sub-serializers-extra](IHMC Pub/Sub serializers extra): Optional serializer to generated JSON, BSON, YAML, Java Properties and XML(limited) output from .idl messages. 
+- [IHMC Pub/Sub](https://github.com/ihmcrobotics/ihmc-pub-sub): IHMC Pub/Sub RTPS library
+- [IHMC Pub/Sub generator](https://github.com/ihmcrobotics/ihmc-pub-sub-generator): Gradle plugin and standalone application to generate java classes from .idl messages.
+- [IHMC RTPS Visualizer](https://github.com/ihmcrobotics/ihmc-rtps-visualizer): GUI to display partitions, topics, participants, subscribers, publisher and publisher data on a RTPS domain.
+- [IHMC Pub/Sub serializers extra](https://github.com/ihmcrobotics/ihmc-pub-sub-serializers-extra): Optional serializer to generated JSON, BSON, YAML, Java Properties and XML(limited) output from .idl messages. 
 
 ## License
 The IHMC RTPS Visualizer is licensed under the Apache 2.0. See LICENSE.txt
