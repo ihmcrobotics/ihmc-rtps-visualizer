@@ -21,12 +21,18 @@ The IHMC RTPS Visualizer is licensed under the Apache 2.0. See LICENSE.txt
 
 ## Usage
 
-Run us.ihmc.rtps.visualizer.IHMCRTPSVisualizer
+The main application class is us.ihmc.rtps.visualizer.IHMCRTPSVisualizer
 
-When checked out from source run "gradle run".
+Currently, this application is only distributed as source. Use the following commands to start 
+```
+git clone https://github.com/ihmcrobotics/ihmc-rtps-visualizer.git
+cd ihmc-rtps-visualizer
+./gradlew run
+```
+
 
 ### Loading Topic data type bundles
-To decode messages it is necessary to create JAR bundles of topic data types using the IHMC Pub Sub Generator. Refer to the IHMC Pub Sub Generator documentation for more information.
+To optionally decode messages it is necessary to create JAR bundles of topic data types using the IHMC Pub Sub Generator. Refer to the IHMC Pub Sub Generator documentation for more information.
 
 Topic data type bundles can be dynamically loaded from the GUI or added as command line argument:
 
