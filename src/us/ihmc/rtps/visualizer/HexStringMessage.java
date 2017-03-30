@@ -23,6 +23,7 @@ import org.apache.commons.io.output.WriterOutputStream;
 
 public class HexStringMessage
 {
+   private String endianness;
    private byte[] data;
    
    
@@ -31,8 +32,9 @@ public class HexStringMessage
       
    }
    
-   public void setData(byte[] data)
+   public void setData(String endianness, byte[] data)
    {
+      this.endianness = endianness;
       this.data = data;
    }
    
@@ -42,6 +44,9 @@ public class HexStringMessage
       try
       {
          StringBuilderWriter writer = new StringBuilderWriter(data.length << 1 + 2);
+         writer.write("Encapsulation: " );
+         writer.write(endianness);
+         writer.write(System.lineSeparator());
          WriterOutputStream os = new WriterOutputStream(writer);
          HexDump.dump(data, 0, os, 0);
          os.close();

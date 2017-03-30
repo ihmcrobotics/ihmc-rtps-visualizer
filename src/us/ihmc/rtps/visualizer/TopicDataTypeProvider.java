@@ -123,6 +123,6 @@ public class TopicDataTypeProvider
          return topicDataTypes.get(topicType);
       }
       
-      return new HexStringTopicDataType(HEX_STRING_MAX_SIZE, topicType, ByteOrder.nativeOrder());
+      return new HexStringTopicDataType(HEX_STRING_MAX_SIZE, topicType);
    }
 }

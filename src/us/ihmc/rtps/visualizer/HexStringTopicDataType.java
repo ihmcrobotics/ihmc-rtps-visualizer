@@ -17,6 +17,7 @@ package us.ihmc.rtps.visualizer;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
+import java.rmi.ServerError;
 
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -28,8 +29,9 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
    private final int maxSize;
    private final String name;
    
+   
 
-   public HexStringTopicDataType(int maxSize, String name, ByteOrder order)
+   public HexStringTopicDataType(int maxSize, String name)
    {
       this.name = name;
       this.maxSize = maxSize;
@@ -44,10 +46,32 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
    @Override
    public void deserialize(SerializedPayload serializedPayload, HexStringMessage data) throws IOException
    {
-      int length = Math.min(serializedPayload.getLength(), maxSize);
+      int length = Math.min(serializedPayload.getLength() - 4, maxSize);
       byte[] dataArray = new byte[length];
+      serializedPayload.getData().get();
+      short encapsulation = serializedPayload.getData().get();
+      serializedPayload.getData().getShort();
+      
+      
+      String endianness = "";
+      switch(encapsulation)
+      {
+      case SerializedPayload.CDR_BE:
+         endianness = "CDR_BE";
+         break;
+      case SerializedPayload.CDR_LE:
+         endianness = "CDR_LE";
+         break;
+      case SerializedPayload.PL_CDR_BE:
+         endianness = "PL_CDR_BE";
+         break;
+      case SerializedPayload.PL_CDR_LE:
+         endianness = "PL_CDR_LE";
+         break;
+      }
+      
       serializedPayload.getData().get(dataArray);
-      data.setData(dataArray);
+      data.setData(endianness, dataArray);
       
    }
 
@@ -67,5 +91,11 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
    public HexStringMessage createData()
    {
       return new HexStringMessage();
+   }
+
+   @Override
+   public TopicDataType<HexStringMessage> newInstance()
+   {
+      return new HexStringTopicDataType(maxSize, name);
    }
 }
