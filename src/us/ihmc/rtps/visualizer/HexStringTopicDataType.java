@@ -16,11 +16,11 @@
 package us.ihmc.rtps.visualizer;
 
 import java.io.IOException;
-import java.nio.ByteOrder;
-import java.rmi.ServerError;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import us.ihmc.idl.CDR;
+import us.ihmc.idl.InterchangeSerializer;
 import us.ihmc.pubsub.TopicDataType;
 import us.ihmc.pubsub.common.SerializedPayload;
 
@@ -97,5 +97,38 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
    public TopicDataType<HexStringMessage> newInstance()
    {
       return new HexStringTopicDataType(maxSize, name);
+   }
+
+   @Override
+   public void serialize(HexStringMessage data, InterchangeSerializer serializer)
+   {
+      throw new NotImplementedException("Serialize is not implemented for this message type");
+      
+   }
+
+   @Override
+   public void deserialize(InterchangeSerializer serializer, HexStringMessage data)
+   {
+      throw new NotImplementedException("deserialize is not implemented for this message type");
+      
+   }
+
+   @Override
+   public void serialize(HexStringMessage data, CDR cdr)
+   {
+      throw new NotImplementedException("Serialize is not implemented for this message type");
+   }
+
+   @Override
+   public void deserialize(HexStringMessage data, CDR cdr)
+   {
+      throw new NotImplementedException("deserialize is not implemented for this message type");
+   }
+
+   @Override
+   public void copy(HexStringMessage src, HexStringMessage dest)
+   {
+      throw new NotImplementedException("copy is not implemented for this message type");
+      
    }
 }
