@@ -15,6 +15,17 @@
  */
 package us.ihmc.rtps.visualizer;
 
+import us.ihmc.pubsub.Domain;
+import us.ihmc.pubsub.DomainFactory;
+import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
+import us.ihmc.pubsub.TopicDataType;
+import us.ihmc.pubsub.attributes.*;
+import us.ihmc.pubsub.attributes.TopicAttributes.TopicKind;
+import us.ihmc.pubsub.common.*;
+import us.ihmc.pubsub.participant.*;
+import us.ihmc.pubsub.subscriber.Subscriber;
+import us.ihmc.pubsub.subscriber.SubscriberListener;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,32 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
-
-import us.ihmc.pubsub.Domain;
-import us.ihmc.pubsub.DomainFactory;
-import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
-import us.ihmc.pubsub.TopicDataType;
-import us.ihmc.pubsub.attributes.DurabilityKind;
-import us.ihmc.pubsub.attributes.Locator;
-import us.ihmc.pubsub.attributes.ParticipantAttributes;
-import us.ihmc.pubsub.attributes.QosInterface;
-import us.ihmc.pubsub.attributes.ReaderQosHolder;
-import us.ihmc.pubsub.attributes.ReliabilityKind;
-import us.ihmc.pubsub.attributes.SubscriberAttributes;
-import us.ihmc.pubsub.attributes.TopicAttributes.TopicKind;
-import us.ihmc.pubsub.attributes.WriterQosHolder;
-import us.ihmc.pubsub.common.DiscoveryStatus;
-import us.ihmc.pubsub.common.Guid;
-import us.ihmc.pubsub.common.MatchingInfo;
-import us.ihmc.pubsub.common.SampleInfo;
-import us.ihmc.pubsub.common.Time;
-import us.ihmc.pubsub.participant.Participant;
-import us.ihmc.pubsub.participant.ParticipantDiscoveryInfo;
-import us.ihmc.pubsub.participant.ParticipantListener;
-import us.ihmc.pubsub.participant.PublisherEndpointDiscoveryListener;
-import us.ihmc.pubsub.participant.SubscriberEndpointDiscoveryListener;
-import us.ihmc.pubsub.subscriber.Subscriber;
-import us.ihmc.pubsub.subscriber.SubscriberListener;
 
 public class IHMCRTPSParticipant
 {
@@ -89,23 +74,16 @@ public class IHMCRTPSParticipant
          Object msg = topicDataType.createData();
          SampleInfo info = new SampleInfo();
          MessageHolder messageHolder;
-         try
+         if (subscriber.takeNextData(msg, info))
          {
-            if(subscriber.takeNextData(msg, info))
-            {
-               messageHolder = new MessageHolder(msg, info);
-            }
-            else
-            {
-               subScriberLock.unlock();
-               return;
-            }
+            messageHolder = new MessageHolder(msg, info);
          }
-         catch (IOException e)
+         else
          {
-            messageHolder = new MessageHolder(true, e.getMessage());
+            subScriberLock.unlock();
+            return;
          }
-         
+
          controller.updateDataList(messageHolder);
          
          subScriberLock.unlock();
