@@ -6,11 +6,13 @@ buildscript {
    dependencies {
       classpath "us.ihmc:ihmc-build:0.13.7"
       classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
+      classpath "gradle.plugin.edu.sc.seis.gradle:launch4j:2.4.4"
    }
 }
 apply plugin: "us.ihmc.ihmc-build"
 apply plugin: "com.github.hierynomus.license"
 apply plugin: "application"
+apply plugin: "edu.sc.seis.launch4j"
 
 ihmc {
    group = "us.ihmc"
@@ -21,10 +23,9 @@ ihmc {
 
    configureDependencyResolution()
    javaDirectory("main", "..")
+   resourceDirectory("main", "../../resources")
    configurePublications()
 }
-
-buildDir = "build-java"
 
 mainClassName="us.ihmc.rtps.visualizer.IHMCRTPSVisualizer"
 
@@ -37,6 +38,10 @@ license {
     header rootProject.file("license-header.txt")
     ext.year = Calendar.getInstance().get(Calendar.YEAR)
     strictCheck true
+}
+
+launch4j {
+   mainClassName = "us.ihmc.rtps.visualizer.IHMCRTPSVisualizer"
 }
 
 task wrapper(type: Wrapper) {
