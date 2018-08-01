@@ -5,7 +5,7 @@ buildscript {
    }
    dependencies {
       classpath "us.ihmc:ihmc-build:0.14.0"
-      classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
+      classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
       classpath "gradle.plugin.edu.sc.seis.gradle:launch4j:2.4.4"
    }
 }
