@@ -23,7 +23,10 @@ The IHMC RTPS Visualizer is licensed under the Apache 2.0. See LICENSE.txt
 
 The main application class is us.ihmc.rtps.visualizer.IHMCRTPSVisualizer
 
-Currently, this application is only distributed as source. Use the following commands to start 
+### Executable:
+Multiplatform executables are available on GitHub: https://github.com/ihmcrobotics/ihmc-rtps-visualizer/releases
+
+### Run from source, use the following commands to start 
 ```
 git clone https://github.com/ihmcrobotics/ihmc-rtps-visualizer.git
 cd ihmc-rtps-visualizer
