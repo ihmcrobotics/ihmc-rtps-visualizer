@@ -37,7 +37,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class IHMCRTPSParticipant
 {
-
    private final ReentrantLock lock = new ReentrantLock();
    private final ReentrantLock subScriberLock = new ReentrantLock();
 
@@ -49,13 +48,9 @@ public class IHMCRTPSParticipant
    private final HashMap<String, PartitionHolder> partitions = new HashMap<>();
 
    private Subscriber subscriber;
-
    private final Domain domain;
-
    private Participant participant;
-   
    private final TopicDataTypeProvider topicDataTypeProvider = new TopicDataTypeProvider();
-   
    
    private class SubscriberListenerImpl implements SubscriberListener
    {
@@ -65,8 +60,7 @@ public class IHMCRTPSParticipant
       {
          this.topicDataType = topicDataType;
       }
-      
-      
+
       @Override
       public void onNewDataMessage(Subscriber subscriber)
       {
@@ -93,12 +87,10 @@ public class IHMCRTPSParticipant
       public void onSubscriptionMatched(Subscriber subscriber, MatchingInfo info)
       {
       }
-      
    }
    
    private class ParticipantListenerImpl implements ParticipantListener
    {
-
       @Override
       public void onParticipantDiscovery(Participant participant, ParticipantDiscoveryInfo info)
       {
@@ -120,9 +112,6 @@ public class IHMCRTPSParticipant
          }
          lock.unlock();
       }
-
-      
-
    }
 
    private class PublisherEndpointDiscoveryListenerImpl implements PublisherEndpointDiscoveryListener
@@ -155,7 +144,6 @@ public class IHMCRTPSParticipant
          }
          lock.unlock();
       }
-
    }
 
    private class SubscriberEndpointDiscoveryListenerImpl implements SubscriberEndpointDiscoveryListener
@@ -171,7 +159,17 @@ public class IHMCRTPSParticipant
          
          lock.lock();
          ParticipantHolder participantHolder = getParticipant(participantGuid);
-         SubscriberAttributesHolder attributes = new SubscriberAttributesHolder(isAlive, guid, expectsInlineQos, unicastLocatorList, multicastLocatorList, participantGuid, typeName, topicName, userDefinedId, javaTopicKind, readerQosHolder);
+         SubscriberAttributesHolder attributes = new SubscriberAttributesHolder(isAlive,
+                                                                                guid,
+                                                                                expectsInlineQos,
+                                                                                unicastLocatorList,
+                                                                                multicastLocatorList,
+                                                                                participantGuid,
+                                                                                typeName,
+                                                                                topicName,
+                                                                                userDefinedId,
+                                                                                javaTopicKind,
+                                                                                readerQosHolder);
          
          List<String> topicPartitions = readerQosHolder.getPartitions();
          if(topicPartitions.isEmpty())
@@ -188,7 +186,6 @@ public class IHMCRTPSParticipant
          }
          lock.unlock();
       }
-
    }
 
    private void removeParticipant(ParticipantHolder removed)
@@ -236,7 +233,6 @@ public class IHMCRTPSParticipant
       domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
       controller.setParticipant(this);
       controller.addPartition(defaultPartition);
-
    }
    
    public void connect(int domainID) throws IOException
@@ -296,7 +292,6 @@ public class IHMCRTPSParticipant
       
       unSubscribeFromTopic();
       
-      
       QosInterface topicQos = topicDataTypeHolder.getTopicQosHolder().getQosInterfaceForSubscriber();
       if(topicQos != null)
       {
@@ -330,7 +325,6 @@ public class IHMCRTPSParticipant
          }
          
          TopicDataType<?> topicDataType = domain.getRegisteredType(participant, topicDataTypeHolder.getTopicDataType()); 
-         
          if(topicDataType == null)
          {
             topicDataType = topicDataTypeProvider.getTopicDataType(topicDataTypeHolder.getTopicDataType());
@@ -368,9 +362,7 @@ public class IHMCRTPSParticipant
                System.err.println("Cannot unregister type " + topicType);
             }
          }
-         
       }
       subScriberLock.unlock();
    }
-
 }
