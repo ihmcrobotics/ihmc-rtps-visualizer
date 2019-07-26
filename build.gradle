@@ -1,7 +1,7 @@
 plugins {
    id("us.ihmc.ihmc-build") version "0.16.5"
    id("us.ihmc.ihmc-ci") version "4.25"
-   id("us.ihmc.ihmc-cd") version "0.1"
+   id("us.ihmc.ihmc-cd") version "0.2"
    id("com.github.hierynomus.license") version "0.14.0"
    id("edu.sc.seis.launch4j") version "2.4.4"
    id("application")
@@ -23,7 +23,7 @@ ihmc {
 mainClassName="us.ihmc.rtps.visualizer.IHMCRTPSVisualizer"
 
 mainDependencies {
-    compile group: "us.ihmc", name: "ihmc-pub-sub", version: "0.10.2"
+    compile group: "us.ihmc", name: "ihmc-pub-sub", version: "0.10.3"
     compile group: "commons-io", name: "commons-io", version: "2.6"
 }
 
