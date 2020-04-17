@@ -4,7 +4,6 @@ plugins {
    id("us.ihmc.ihmc-cd") version "1.8"
    id("com.github.hierynomus.license") version "0.14.0"
    id("edu.sc.seis.launch4j") version "2.4.4"
-   id("application")
 }
 
 ihmc {
@@ -20,7 +19,7 @@ ihmc {
    configurePublications()
 }
 
-mainClassName="us.ihmc.rtps.visualizer.IHMCRTPSVisualizer"
+app.entrypoint("IHMCRTPSVisualizer", "us.ihmc.rtps.visualizer.IHMCRTPSVisualizer")
 
 mainDependencies {
     api("us.ihmc:ihmc-pub-sub:0.11.0")
@@ -28,9 +27,8 @@ mainDependencies {
 }
 
 license {
-    header rootProject.file("license-header.txt")
-    ext.year = Calendar.getInstance().get(Calendar.YEAR)
-    strictCheck true
+    header = rootProject.file("license-header.txt")
+    strictCheck = true
 }
 
 launch4j {
