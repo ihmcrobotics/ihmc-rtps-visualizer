@@ -26,6 +26,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -35,11 +36,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
+import javafx.util.StringConverter;
 
 public class IHMCRTPSController implements Initializable
 {
@@ -130,11 +133,49 @@ public class IHMCRTPSController implements Initializable
       Platform.runLater(() -> topicRoot.getChildren().remove(partition));
    }
 
+   /**
+    * Create a listener on the Domain ID spinner. This allows one to set the Domain ID without having
+    * to hit ENTER.
+    * 
+    * @param <T>
+    * @param spinner
+    */
+   private <T> void commitDomainText(Spinner<T> spinner)
+   {
+      if (!spinner.isEditable())
+         return;
+      String text = spinner.getEditor().getText();
+      if (text.isEmpty())
+      {
+         Alert alert = new Alert(AlertType.ERROR);
+         alert.setContentText("Invalid Domain ID");
+         alert.show();
+         return;
+      }
+      SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
+      if (valueFactory != null)
+      {
+         StringConverter<T> converter = valueFactory.getConverter();
+         if (converter != null)
+         {
+            T value = converter.fromString(text);
+            valueFactory.setValue(value);
+         }
+      }
+   }
+
    @Override
    public void initialize(URL location, ResourceBundle resources)
    {
       domainSelector.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 232));
-      
+      // Add listener for domain spinner text to update when user updates
+      domainSelector.focusedProperty().addListener((s, ov, nv) ->
+      {
+         if (nv)
+            return;
+         commitDomainText(domainSelector);
+      });
+
       timestamp.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
       sequence.setCellValueFactory(new PropertyValueFactory<>("sequenceNumber"));
       bytes.setCellValueFactory(new PropertyValueFactory<>("bytes"));
