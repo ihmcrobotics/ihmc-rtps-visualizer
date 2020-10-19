@@ -27,8 +27,6 @@ public class TopicQosHolder
    private final ArrayList<QosInterface> writerQos = new ArrayList<>();
    private final ArrayList<QosInterface> readerQos = new ArrayList<>();
    
-   
-   
    private String error = DEFAULT_MSG;
    
    public synchronized boolean update(QosInterface qosInterface)
@@ -41,8 +39,7 @@ public class TopicQosHolder
       {
          readerQos.add(qosInterface);
       }
-      
-      
+
       for(QosInterface wQos : writerQos)
       {
          for(QosInterface rQos : readerQos)
