@@ -117,8 +117,16 @@ public class IHMCRTPSParticipant
    private class PublisherEndpointDiscoveryListenerImpl implements PublisherEndpointDiscoveryListener
    {
       @Override
-      public void publisherTopicChange(boolean isAlive, Guid guid, ArrayList<Locator> unicastLocatorList, ArrayList<Locator> multicastLocatorList,
-                                       Guid participantGuid, String typeName, String topicName, int userDefinedId, long typeMaxSerialized, TopicKind topicKind,
+      public void publisherTopicChange(boolean isAlive,
+                                       Guid guid,
+                                       ArrayList<Locator> unicastLocatorList,
+                                       ArrayList<Locator> multicastLocatorList,
+                                       Guid participantGuid,
+                                       String typeName,
+                                       String topicName,
+                                       int userDefinedId,
+                                       long typeMaxSerialized,
+                                       TopicKind topicKind,
                                        WriterQosHolder writerQosHolder)
       {
          if(participantGuid.equals(myGUID))
@@ -126,8 +134,16 @@ public class IHMCRTPSParticipant
          
          lock.lock();
          ParticipantHolder participantHolder = getParticipant(participantGuid);
-         PublisherAttributesHolder attributes = new PublisherAttributesHolder(isAlive, guid, unicastLocatorList, multicastLocatorList, participantGuid,
-                                                                              typeName, topicName, userDefinedId, typeMaxSerialized, topicKind,
+         PublisherAttributesHolder attributes = new PublisherAttributesHolder(isAlive,
+                                                                              guid,
+                                                                              unicastLocatorList,
+                                                                              multicastLocatorList,
+                                                                              participantGuid,
+                                                                              typeName,
+                                                                              topicName,
+                                                                              userDefinedId,
+                                                                              typeMaxSerialized,
+                                                                              topicKind,
                                                                               writerQosHolder);
          
          List<String> topicPartitions = writerQosHolder.getPartitions();
@@ -148,9 +164,17 @@ public class IHMCRTPSParticipant
    private class SubscriberEndpointDiscoveryListenerImpl implements SubscriberEndpointDiscoveryListener
    {
       @Override
-      public void subscriberTopicChange(boolean isAlive, Guid guid, boolean expectsInlineQos, ArrayList<Locator> unicastLocatorList,
-                                        ArrayList<Locator> multicastLocatorList, Guid participantGuid, String typeName, String topicName, int userDefinedId,
-                                        TopicKind javaTopicKind, ReaderQosHolder readerQosHolder)
+      public void subscriberTopicChange(boolean isAlive,
+                                        Guid guid,
+                                        boolean expectsInlineQos,
+                                        ArrayList<Locator> unicastLocatorList,
+                                        ArrayList<Locator> multicastLocatorList,
+                                        Guid participantGuid,
+                                        String typeName,
+                                        String topicName,
+                                        int userDefinedId,
+                                        TopicKind javaTopicKind,
+                                        ReaderQosHolder readerQosHolder)
       {
          if(participantGuid.equals(myGUID))
             return;
