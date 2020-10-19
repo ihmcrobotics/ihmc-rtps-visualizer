@@ -43,6 +43,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
+import us.ihmc.log.LogTools;
 
 public class IHMCRTPSController implements Initializable
 {

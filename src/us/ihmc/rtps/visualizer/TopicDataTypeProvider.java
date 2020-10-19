@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import us.ihmc.log.LogTools;
 import us.ihmc.pubsub.TopicDataType;
 
 public class TopicDataTypeProvider
@@ -44,12 +45,12 @@ public class TopicDataTypeProvider
             File bundleFile = new File(bundle);
             if(bundleFile.exists())
             {
-               System.out.println("Loading topic data type bundle " + bundle);
+               LogTools.info("Loading topic data type bundle {}", bundle);
                loadBundle(bundleFile);
             }
             else
             {
-               System.err.println("Cannot find topic data type bundle " + bundle);
+               LogTools.error("Cannot find topic data type bundle {}", bundle);
             }
          }
       }
@@ -92,12 +93,12 @@ public class TopicDataTypeProvider
                   TopicDataType<?> dataType = (TopicDataType<?>) clazz.newInstance();
                   topicDataTypes.put(dataType.getName(), dataType);
                   registeredTopics.add(dataType.getName());
-                  System.out.println("Registered topic data type: " + dataType.getName());
+                  LogTools.info("Registered topic data type: {}", dataType.getName());
                }
             }
             catch (Throwable e)
-            {  
-               System.err.println("Cannot load " + className + ": " + e.getMessage());
+            {
+               LogTools.error("Cannot load {}: {}", className, e.getMessage());
             }
          }
       }

@@ -15,6 +15,7 @@
  */
 package us.ihmc.rtps.visualizer;
 
+import us.ihmc.log.LogTools;
 import us.ihmc.pubsub.Domain;
 import us.ihmc.pubsub.DomainFactory;
 import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
@@ -381,7 +382,7 @@ public class IHMCRTPSParticipant
             }
             catch (IOException e)
             {
-               System.err.println("Cannot unregister type " + topicType);
+               LogTools.error("Cannot unregister type {}", topicType);
             }
          }
       }
