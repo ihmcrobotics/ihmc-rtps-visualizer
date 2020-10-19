@@ -47,41 +47,22 @@ import javafx.util.StringConverter;
 public class IHMCRTPSController implements Initializable
 {
    private IHMCRTPSParticipant participant;
-   @FXML
-   private BorderPane mainPane;
-   
-   @FXML
-   private TreeView<String> topicTree;
-   @FXML
-   private TreeView<String> participantTree;
-   @FXML
-   private TableView<MessageHolder> dataList;
-   
-   @FXML
-   private TableColumn<MessageHolder, String> timestamp;
-   @FXML
-   private TableColumn<MessageHolder, String> sequence;
-   @FXML
-   private TableColumn<MessageHolder, String> bytes;
-   @FXML
-   private TableColumn<MessageHolder, String> change;
-   
-   @FXML
-   private Spinner<Integer> domainSelector;
-   @FXML
-   private Button connect;
-   
-   
-   @FXML
-   private TreeView<String> participantDataTree;
-   @FXML
-   private Label qosPolicyLabel;
-   
-   @FXML
-   private TextArea message;
 
-   @FXML
-   private void loadDataTypesAction(ActionEvent event)
+   @FXML private BorderPane mainPane;
+   @FXML private TreeView<String> topicTree;
+   @FXML private TreeView<String> participantTree;
+   @FXML private TableView<MessageHolder> dataList;
+   @FXML private TableColumn<MessageHolder, String> timestamp;
+   @FXML private TableColumn<MessageHolder, String> sequence;
+   @FXML private TableColumn<MessageHolder, String> bytes;
+   @FXML private TableColumn<MessageHolder, String> change;
+   @FXML private Spinner<Integer> domainSelector;
+   @FXML private Button connect;
+   @FXML private TreeView<String> participantDataTree;
+   @FXML private Label qosPolicyLabel;
+   @FXML private TextArea message;
+
+   @FXML private void loadDataTypesAction(ActionEvent event)
    {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Open Resource File");
@@ -95,8 +76,7 @@ public class IHMCRTPSController implements Initializable
       }
    }
    
-   @FXML
-   private void connect(ActionEvent event)
+   @FXML private void connect(ActionEvent event)
    {
       if(domainSelector.isDisable())
       {
