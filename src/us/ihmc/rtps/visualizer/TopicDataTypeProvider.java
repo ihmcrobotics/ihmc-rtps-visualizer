@@ -34,7 +34,6 @@ public class TopicDataTypeProvider
    private static final int HEX_STRING_MAX_SIZE = 66560;
    private final HashMap<String, TopicDataType<?>> topicDataTypes = new HashMap<>();
    
-   
    public TopicDataTypeProvider()
    {
       String bundles = System.getProperty("dataTypeBundles");
@@ -55,10 +54,8 @@ public class TopicDataTypeProvider
             }
          }
       }
-      
    }
-   
-   
+
    public List<String> loadBundle(File bundle)
    {
       ArrayList<String> registeredTopics = new ArrayList<>();
@@ -104,17 +101,13 @@ public class TopicDataTypeProvider
                System.err.println("Cannot load " + className + ": " + e.getMessage());
             }
          }
-         
-         
       }
       catch (IOException e)
       {
          e.printStackTrace();
       }
       return registeredTopics;
-      
    }
-   
    
    public TopicDataType<?> getTopicDataType(String topicType)
    {

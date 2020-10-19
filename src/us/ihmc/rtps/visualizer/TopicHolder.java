@@ -25,13 +25,11 @@ import us.ihmc.pubsub.common.Guid;
 
 public class TopicHolder extends TreeItem<String>
 {
-   
    private final String name;
    private final String partition;
    
    private final HashMap<String, TopicDataTypeHolder> topicTypes = new HashMap<>();
-   
-   
+
    public TopicHolder(String name, String partition)
    {
       super(name);
@@ -49,7 +47,6 @@ public class TopicHolder extends TreeItem<String>
          Platform.runLater(() -> this.getChildren().add(value));
       }
       return topicTypes.get(attributesHolder.getTopicType());
-
    }
    
    public void addSubscriber(Guid guid, ParticipantHolder participantGuid, SubscriberAttributesHolder attributes)
@@ -87,5 +84,4 @@ public class TopicHolder extends TreeItem<String>
    {
       return name;
    }
-
 }

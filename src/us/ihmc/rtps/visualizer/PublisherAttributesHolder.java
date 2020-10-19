@@ -28,9 +28,7 @@ public class PublisherAttributesHolder extends TreeItem<String> implements Topic
    private final String topicName;
    private final String topicType;
    private final WriterQosHolder writerQosHolder;
-   
-   
-   
+
    public PublisherAttributesHolder(boolean isAlive, Guid guid, ArrayList<Locator> unicastLocatorList, ArrayList<Locator> multicastLocatorList,
                                     Guid participantGuid, String typeName, String topicName, int userDefinedId, long typeMaxSerialized, TopicKind topicKind,
                                     WriterQosHolder writerQosHolder)
@@ -71,20 +69,17 @@ public class PublisherAttributesHolder extends TreeItem<String> implements Topic
       getChildren().add(qos);
    }
 
-
    @Override
    public String getTopicName()
    {
       return topicName;
    }
 
-
    @Override
    public String getTopicType()
    {
       return topicType;
    }
-
 
    @Override
    public WriterQosHolder getQosInterface()

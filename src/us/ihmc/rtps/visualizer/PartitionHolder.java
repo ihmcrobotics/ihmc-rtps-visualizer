@@ -36,7 +36,6 @@ public class PartitionHolder extends TreeItem<String>
       this.name = name;
       this.displayName = name;
       setExpanded(true);
-
    }
 
    public PartitionHolder()
@@ -57,7 +56,6 @@ public class PartitionHolder extends TreeItem<String>
          Platform.runLater(() -> this.getChildren().add(value));
       }
       return topics.get(topicName);
-
    }
 
    public void addPublisher(Guid guid, ParticipantHolder participantHolder, PublisherAttributesHolder attributes)
@@ -85,7 +83,6 @@ public class PartitionHolder extends TreeItem<String>
             it.remove();
          }
       }
-
    }
 
    public boolean isEmpty()

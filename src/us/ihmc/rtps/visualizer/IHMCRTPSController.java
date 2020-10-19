@@ -206,7 +206,6 @@ public class IHMCRTPSController implements Initializable
             participantDataTree.setRoot(null);
          }
       });
-
    }
 
    private void selectedData(MessageHolder newValue)
@@ -255,5 +254,4 @@ public class IHMCRTPSController implements Initializable
    {
       Platform.runLater(() -> dataObserverable.clear());
    }
-
 }

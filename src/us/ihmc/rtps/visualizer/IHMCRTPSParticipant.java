@@ -116,7 +116,6 @@ public class IHMCRTPSParticipant
 
    private class PublisherEndpointDiscoveryListenerImpl implements PublisherEndpointDiscoveryListener
    {
-
       @Override
       public void publisherTopicChange(boolean isAlive, Guid guid, ArrayList<Locator> unicastLocatorList, ArrayList<Locator> multicastLocatorList,
                                        Guid participantGuid, String typeName, String topicName, int userDefinedId, long typeMaxSerialized, TopicKind topicKind,
@@ -148,7 +147,6 @@ public class IHMCRTPSParticipant
 
    private class SubscriberEndpointDiscoveryListenerImpl implements SubscriberEndpointDiscoveryListener
    {
-
       @Override
       public void subscriberTopicChange(boolean isAlive, Guid guid, boolean expectsInlineQos, ArrayList<Locator> unicastLocatorList,
                                         ArrayList<Locator> multicastLocatorList, Guid participantGuid, String typeName, String topicName, int userDefinedId,

@@ -54,6 +54,4 @@ public class ParticipantHolder
    {
       return guid;
    }
-   
-   
 }

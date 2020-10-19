@@ -19,11 +19,9 @@ import us.ihmc.pubsub.attributes.QosInterface;
 
 public interface TopicAttributesHolder
 {
-
    String getTopicName();
 
    String getTopicType();
 
    QosInterface getQosInterface();
-
 }

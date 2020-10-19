@@ -29,8 +29,6 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
    private final int maxSize;
    private final String name;
    
-   
-
    public HexStringTopicDataType(int maxSize, String name)
    {
       this.name = name;
@@ -52,7 +50,6 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
       short encapsulation = serializedPayload.getData().get();
       serializedPayload.getData().getShort();
       
-      
       String endianness = "";
       switch(encapsulation)
       {
@@ -72,7 +69,6 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
       
       serializedPayload.getData().get(dataArray);
       data.setData(endianness, dataArray);
-      
    }
 
    @Override
@@ -103,14 +99,12 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
    public void serialize(HexStringMessage data, InterchangeSerializer serializer)
    {
       throw new NotImplementedException("Serialize is not implemented for this message type");
-      
    }
 
    @Override
    public void deserialize(InterchangeSerializer serializer, HexStringMessage data)
    {
       throw new NotImplementedException("deserialize is not implemented for this message type");
-      
    }
 
    @Override
@@ -129,6 +123,5 @@ public class HexStringTopicDataType implements TopicDataType<HexStringMessage>
    public void copy(HexStringMessage src, HexStringMessage dest)
    {
       throw new NotImplementedException("copy is not implemented for this message type");
-      
    }
 }

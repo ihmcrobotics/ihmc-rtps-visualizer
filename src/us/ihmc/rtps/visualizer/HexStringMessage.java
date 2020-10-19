@@ -25,8 +25,7 @@ public class HexStringMessage
 {
    private String endianness;
    private byte[] data;
-   
-   
+
    public HexStringMessage()
    {
       
@@ -56,6 +55,5 @@ public class HexStringMessage
       {
          return e.getMessage();
       }
-
    }
 }

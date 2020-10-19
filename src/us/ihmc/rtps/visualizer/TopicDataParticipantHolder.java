@@ -44,6 +44,4 @@ public class TopicDataParticipantHolder extends TreeItem<String>
       publishers.put(guid, leaf);
       getChildren().add(leaf);
    }
-   
-   
 }

@@ -26,20 +26,17 @@ import us.ihmc.pubsub.common.Guid;
 
 public class TopicDataTypeHolder extends TreeItem<String>
 {
-   
    private final static Image ERROR_IMAGE = new Image(TopicHolder.class.getResourceAsStream("error_icon_16x16.png"));
 
    private final TreeItem<String> rootNode;
    private final HashMap<ParticipantHolder, TopicDataParticipantHolder> participants = new HashMap<>();
 
-   
    private final String topicName;
    private final String topicDataType;
    private final String partition;
    
    private final TopicQosHolder topicQosHolder = new TopicQosHolder();
-   
-   
+
    public TopicDataTypeHolder(String name, String topicName, String topicDataType, String partition)
    {
       super(name);
@@ -122,6 +119,4 @@ public class TopicDataTypeHolder extends TreeItem<String>
    {
       return partition;
    }
-   
-   
 }

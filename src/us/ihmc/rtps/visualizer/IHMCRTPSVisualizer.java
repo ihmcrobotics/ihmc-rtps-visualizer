@@ -25,28 +25,19 @@ import javafx.stage.Stage;
 
 public class IHMCRTPSVisualizer extends Application
 {
-
-   
-   
-
    @Override
    public void start(Stage stage) throws IOException
    {
-     
       FXMLLoader loader = new FXMLLoader(getClass().getResource("IHMCRTPSVisualizer.fxml"));
       Parent root = loader.load();
-      
-      
+
       IHMCRTPSController controller = loader.getController();
       new IHMCRTPSParticipant(controller);
-      
-      
-      
+
       Scene scene = new Scene(root, 1024, 720);
       stage.setTitle("IHMC RTPS Visualizer");
       stage.setScene(scene);
       stage.show();
-      
    }
 
    public static void main(String[] args)

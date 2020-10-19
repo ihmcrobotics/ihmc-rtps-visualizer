@@ -28,8 +28,7 @@ public class MessageHolder
    private final SimpleLongProperty sequenceNumber = new SimpleLongProperty();
    private final SimpleIntegerProperty bytes = new SimpleIntegerProperty();
    private final SimpleStringProperty changeKind = new SimpleStringProperty();
-   
-   
+
    private final boolean valid;
    private final String stackTrace;
    private final Object msg;
@@ -61,7 +60,6 @@ public class MessageHolder
       this.stackTrace = stackTrace;
       
       this.timestamp.set("<Corrupted message>");      
-      
    }
 
    public String getData()
@@ -142,7 +140,4 @@ public class MessageHolder
    {
       return changeKind.get();
    }
-   
-   
-   
 }
