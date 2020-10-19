@@ -14,16 +14,18 @@ ihmc {
    openSource = true
 
    configureDependencyResolution()
-   javaDirectory("main", "..")
-   resourceDirectory("main", "../../resources")
    configurePublications()
 }
 
 app.entrypoint("IHMCRTPSVisualizer", "us.ihmc.rtps.visualizer.IHMCRTPSVisualizer")
 
 mainDependencies {
-    api("us.ihmc:ihmc-pub-sub:0.15.0")
-    api("commons-io:commons-io:2.6")
+   api("us.ihmc:ihmc-pub-sub:0.15.0")
+   api("commons-io:commons-io:2.6")
+}
+
+testDependencies {
+   api("us.ihmc:ros2-common-interfaces:0.19.3")
 }
 
 license {
