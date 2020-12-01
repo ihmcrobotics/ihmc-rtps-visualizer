@@ -25,7 +25,7 @@ mainDependencies {
 }
 
 testDependencies {
-   api("us.ihmc:ros2-common-interfaces:0.19.3")
+   api("us.ihmc:ros2-common-interfaces:0.19.4")
 }
 
 license {
