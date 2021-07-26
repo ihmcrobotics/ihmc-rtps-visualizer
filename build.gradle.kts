@@ -25,7 +25,7 @@ mainDependencies {
 }
 
 testDependencies {
-   api("us.ihmc:ros2-common-interfaces:0.19.4") {
+   api("us.ihmc:ros2-common-interfaces:0.20.3") {
       exclude(group = "us.ihmc", module = "euclid")
    }
    api("us.ihmc:euclid-geometry:0.16.2")
