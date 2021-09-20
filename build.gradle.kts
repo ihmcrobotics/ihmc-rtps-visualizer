@@ -20,7 +20,7 @@ ihmc {
 app.entrypoint("IHMCRTPSVisualizer", "us.ihmc.rtps.visualizer.IHMCRTPSVisualizer")
 
 mainDependencies {
-   api("us.ihmc:ihmc-pub-sub:0.16.1")
+   api("us.ihmc:ihmc-pub-sub:0.16.2")
    api("commons-io:commons-io:2.8.0")
 }
 
