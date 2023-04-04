@@ -21,6 +21,7 @@ app.entrypoint("IHMCRTPSVisualizer", "us.ihmc.rtps.visualizer.IHMCRTPSVisualizer
 
 mainDependencies {
    api("us.ihmc:ihmc-pub-sub:0.18.1")
+   api("us.ihmc:ihmc-javafx-toolkit:17-0.22.2")
 }
 
 testDependencies {
