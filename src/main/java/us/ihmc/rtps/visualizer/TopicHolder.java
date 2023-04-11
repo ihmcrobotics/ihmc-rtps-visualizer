@@ -26,15 +26,13 @@ import us.ihmc.pubsub.common.Guid;
 public class TopicHolder extends TreeItem<String>
 {
    private final String name;
-   private final String partition;
-   
+
    private final HashMap<String, TopicDataTypeHolder> topicTypes = new HashMap<>();
 
-   public TopicHolder(String name, String partition)
+   public TopicHolder(String name)
    {
       super(name);
       this.name = name;
-      this.partition = partition;
       setExpanded(true);
    }
    
@@ -42,7 +40,7 @@ public class TopicHolder extends TreeItem<String>
    {
       if(!topicTypes.containsKey(attributesHolder.getTopicType()))
       {
-         TopicDataTypeHolder value = new TopicDataTypeHolder(attributesHolder.getTopicType(), attributesHolder.getTopicName(), attributesHolder.getTopicType(), partition);
+         TopicDataTypeHolder value = new TopicDataTypeHolder(attributesHolder.getTopicType(), attributesHolder.getTopicType());
          topicTypes.put(attributesHolder.getTopicType(), value);
          Platform.runLater(() -> this.getChildren().add(value));
       }

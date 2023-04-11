@@ -51,7 +51,7 @@ public class PartitionHolder extends TreeItem<String>
       if (!topics.containsKey(topicName))
       {
 
-         TopicHolder value = new TopicHolder(topicName, name);
+         TopicHolder value = new TopicHolder(topicName);
          topics.put(topicName, value);
          Platform.runLater(() -> this.getChildren().add(value));
       }

@@ -43,7 +43,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
-import us.ihmc.log.LogTools;
 
 public class IHMCRTPSController implements Initializable
 {
@@ -91,7 +90,7 @@ public class IHMCRTPSController implements Initializable
          connect.setText("Disconnect");
          try
          {
-            participant.connect(domainSelector.getValue().intValue());
+            participant.connect(domainSelector.getValue());
          }
          catch (IOException e)
          {
@@ -205,12 +204,10 @@ public class IHMCRTPSController implements Initializable
    {
       if(participant != null)
       {
-         if (newValue instanceof TopicDataTypeHolder)
+         if (newValue instanceof TopicDataTypeHolder topicDataTypeHolder)
          {
-            TopicDataTypeHolder topicDataTypeHolder = (TopicDataTypeHolder) newValue;
             participantTree.setRoot(topicDataTypeHolder.getRootNode());
             participant.subscribeToTopic(topicDataTypeHolder);
-            qosPolicyLabel.setText(topicDataTypeHolder.getTopicQosHolder().getError());
          }
          else
          {
@@ -228,11 +225,13 @@ public class IHMCRTPSController implements Initializable
 
    public void updateDataList(MessageHolder messageHolder)
    {
-      Platform.runLater(() -> dataObserverable.add(messageHolder));
+      Platform.runLater(() -> {
+         dataObserverable.add(messageHolder);
+      });
    }
    
    public void clearDataList()
    {
-      Platform.runLater(() -> dataObserverable.clear());
+      Platform.runLater(dataObserverable::clear);
    }
 }

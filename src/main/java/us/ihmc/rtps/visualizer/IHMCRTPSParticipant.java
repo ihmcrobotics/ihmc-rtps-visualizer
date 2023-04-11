@@ -15,13 +15,13 @@
  */
 package us.ihmc.rtps.visualizer;
 
+import com.eprosima.xmlschemas.fastrtps_profiles.TopicKindType;
 import us.ihmc.log.LogTools;
 import us.ihmc.pubsub.Domain;
 import us.ihmc.pubsub.DomainFactory;
 import us.ihmc.pubsub.DomainFactory.PubSubImplementation;
 import us.ihmc.pubsub.TopicDataType;
 import us.ihmc.pubsub.attributes.*;
-import us.ihmc.pubsub.attributes.TopicAttributes.TopicKind;
 import us.ihmc.pubsub.common.*;
 import us.ihmc.pubsub.participant.*;
 import us.ihmc.pubsub.subscriber.Subscriber;
@@ -29,7 +29,6 @@ import us.ihmc.pubsub.subscriber.SubscriberListener;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -115,99 +114,32 @@ public class IHMCRTPSParticipant
       }
    }
 
-   private class PublisherEndpointDiscoveryListenerImpl implements PublisherEndpointDiscoveryListener
+   private static class PublisherEndpointDiscoveryListenerImpl implements PublisherEndpointDiscoveryListener
    {
       @Override
       public void publisherTopicChange(boolean isAlive,
                                        Guid guid,
-                                       ArrayList<Locator> unicastLocatorList,
-                                       ArrayList<Locator> multicastLocatorList,
                                        Guid participantGuid,
                                        String typeName,
                                        String topicName,
                                        int userDefinedId,
                                        long typeMaxSerialized,
-                                       TopicKind topicKind,
-                                       WriterQosHolder writerQosHolder)
+                                       TopicKindType topicKind)
       {
-         if(participantGuid.equals(myGUID))
-            return;
-         
-         lock.lock();
-         ParticipantHolder participantHolder = getParticipant(participantGuid);
-         PublisherAttributesHolder attributes = new PublisherAttributesHolder(isAlive,
-                                                                              guid,
-                                                                              unicastLocatorList,
-                                                                              multicastLocatorList,
-                                                                              participantGuid,
-                                                                              typeName,
-                                                                              topicName,
-                                                                              userDefinedId,
-                                                                              typeMaxSerialized,
-                                                                              topicKind,
-                                                                              writerQosHolder);
-         
-         List<String> topicPartitions = writerQosHolder.getPartitions();
-         if(topicPartitions.isEmpty())
-         {
-            defaultPartition.addPublisher(guid, participantHolder, attributes);
-         }
-         
-         for(String partition : topicPartitions)
-         {
-            PartitionHolder partitionHolder = getPartition(partition);
-            partitionHolder.addPublisher(guid, participantHolder, attributes);
-         }
-         lock.unlock();
       }
    }
 
-   private class SubscriberEndpointDiscoveryListenerImpl implements SubscriberEndpointDiscoveryListener
+   private static class SubscriberEndpointDiscoveryListenerImpl implements SubscriberEndpointDiscoveryListener
    {
-      @Override
       public void subscriberTopicChange(boolean isAlive,
                                         Guid guid,
                                         boolean expectsInlineQos,
-                                        ArrayList<Locator> unicastLocatorList,
-                                        ArrayList<Locator> multicastLocatorList,
                                         Guid participantGuid,
                                         String typeName,
                                         String topicName,
                                         int userDefinedId,
-                                        TopicKind javaTopicKind,
-                                        ReaderQosHolder readerQosHolder)
+                                        TopicKindType javaTopicKind)
       {
-         if(participantGuid.equals(myGUID))
-            return;
-         
-         lock.lock();
-         ParticipantHolder participantHolder = getParticipant(participantGuid);
-         SubscriberAttributesHolder attributes = new SubscriberAttributesHolder(isAlive,
-                                                                                guid,
-                                                                                expectsInlineQos,
-                                                                                unicastLocatorList,
-                                                                                multicastLocatorList,
-                                                                                participantGuid,
-                                                                                typeName,
-                                                                                topicName,
-                                                                                userDefinedId,
-                                                                                javaTopicKind,
-                                                                                readerQosHolder);
-         
-         List<String> topicPartitions = readerQosHolder.getPartitions();
-         if(topicPartitions.isEmpty())
-         {
-            defaultPartition.addSubscriber(guid, participantHolder, attributes);
-         }
-         else
-         {
-            for(String partition : topicPartitions)
-            {
-               PartitionHolder partitionHolder = getPartition(partition);
-               partitionHolder.addSubscriber(guid, participantHolder, attributes);
-            }
-         }
-         lock.unlock();
       }
    }
 
@@ -250,7 +182,7 @@ public class IHMCRTPSParticipant
       return partitions.get(name);
    }
 
-   public IHMCRTPSParticipant(IHMCRTPSController controller) throws IOException
+   public IHMCRTPSParticipant(IHMCRTPSController controller)
    {
       this.controller = controller;
       domain = DomainFactory.getDomain(PubSubImplementation.FAST_RTPS);
@@ -262,10 +194,8 @@ public class IHMCRTPSParticipant
    {
       lock.lock();
       
-      ParticipantAttributes attributes = domain.createParticipantAttributes();
-      attributes.setDomainId(domainID);
-      attributes.setLeaseDuration(Time.Infinite);
-      attributes.setName("IHMCRTPSVisualizer");
+      ParticipantAttributes attributes = domain.createParticipantAttributes(domainID, "IHMCRTPSVisualizer");
+      attributes.discoveryLeaseDuration(Time.Infinite);
       participant = domain.createParticipant(attributes, new ParticipantListenerImpl());
       myGUID = participant.getGuid();
       participant.registerEndpointDiscoveryListeners(new PublisherEndpointDiscoveryListenerImpl(), new SubscriberEndpointDiscoveryListenerImpl());
@@ -314,56 +244,25 @@ public class IHMCRTPSParticipant
       }
       
       unSubscribeFromTopic();
-      
-      QosInterface topicQos = topicDataTypeHolder.getTopicQosHolder().getQosInterfaceForSubscriber();
-      if(topicQos != null)
-      {
-         SubscriberAttributes attr = domain.createSubscriberAttributes();
-         attr.getTopic().setTopicKind(TopicKind.NO_KEY);
-         attr.getTopic().setTopicDataType(topicDataTypeHolder.getTopicDataType());
-         attr.getTopic().setTopicName(topicDataTypeHolder.getTopicName());
 
-         if(topicQos.getReliabilityKind() == ReliabilityKind.RELIABLE)
-         {
-            attr.getQos().setReliabilityKind(ReliabilityKind.RELIABLE);
-         }
-         else
-         {
-            attr.getQos().setReliabilityKind(ReliabilityKind.BEST_EFFORT); // Best effort always works
-         }
-         if(topicQos.getDurabilityKind() == DurabilityKind.VOLATILE_DURABILITY_QOS)
-         {
-            attr.getQos().setDurabilityKind(DurabilityKind.VOLATILE_DURABILITY_QOS); // Volatile always works            
-         }
-         else
-         {
-            attr.getQos().setDurabilityKind(DurabilityKind.TRANSIENT_LOCAL_DURABILITY_QOS);
-         }
-         
-         attr.getQos().setOwnershipPolicyKind(topicQos.getOwnershipPolicyKind()); // Ownership needs to match
-         
-         if(topicDataTypeHolder.getPartition() != null)
-         {
-            attr.getQos().addPartition(topicDataTypeHolder.getPartition());
-         }
-         
-         TopicDataType<?> topicDataType = domain.getRegisteredType(participant, topicDataTypeHolder.getTopicDataType()); 
-         if(topicDataType == null)
-         {
-            topicDataType = topicDataTypeProvider.getTopicDataType(topicDataTypeHolder.getTopicDataType());
-            domain.registerType(participant, topicDataType);
-         }
-         
-         try
-         {
-            subscriber = domain.createSubscriber(participant, attr, new SubscriberListenerImpl(topicDataType));
-         }
-         catch (IllegalArgumentException | IOException e)
-         {
-            e.printStackTrace();
-         }
+      SubscriberAttributes attr = new SubscriberAttributes();
+
+      TopicDataType<?> topicDataType = domain.getRegisteredType(participant, topicDataTypeHolder.getTopicDataType());
+      if(topicDataType == null)
+      {
+         topicDataType = topicDataTypeProvider.getTopicDataType(topicDataTypeHolder.getTopicDataType());
+         domain.registerType(participant, topicDataType);
       }
-      
+
+      try
+      {
+         subscriber = domain.createSubscriber(participant, attr, new SubscriberListenerImpl(topicDataType));
+      }
+      catch (IllegalArgumentException | IOException e)
+      {
+         e.printStackTrace();
+      }
+
       subScriberLock.unlock();
    }
 
