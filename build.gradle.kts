@@ -20,11 +20,11 @@ ihmc {
 app.entrypoint("IHMCRTPSVisualizer", "us.ihmc.rtps.visualizer.IHMCRTPSVisualizer")
 
 mainDependencies {
-   api("us.ihmc:ihmc-pub-sub:0.18.1")
+   api("us.ihmc:ihmc-pub-sub:0.18.4")
 }
 
 testDependencies {
-   api("us.ihmc:ros2-common-interfaces:0.22.2") {
+   api("us.ihmc:ros2-common-interfaces:0.22.4") {
       exclude(group = "us.ihmc", module = "euclid")
    }
    api("us.ihmc:euclid-geometry:0.16.2")
