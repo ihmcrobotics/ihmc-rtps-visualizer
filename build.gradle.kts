@@ -21,7 +21,22 @@ app.entrypoint("IHMCRTPSVisualizer", "us.ihmc.rtps.visualizer.IHMCRTPSVisualizer
 
 mainDependencies {
    api("us.ihmc:ihmc-pub-sub:0.18.1")
-   api("us.ihmc:ihmc-javafx-toolkit:17-0.22.2")
+   api("us.ihmc:ihmc-graphics-javafx:source")
+   
+   
+    var javaFXVersion = "17.0.2"
+   api(ihmc.javaFXModule("base", javaFXVersion))
+   api(ihmc.javaFXModule("controls", javaFXVersion))
+   api(ihmc.javaFXModule("graphics", javaFXVersion))
+   api(ihmc.javaFXModule("fxml", javaFXVersion))
+   api(ihmc.javaFXModule("swing", javaFXVersion))
+
+   api("us.ihmc:ihmc-javafx-toolkit:17-0.22.2") {
+      exclude(group="us.ihmc", module="jassimp")
+      exclude(group="us.ihmc", module="euclid")
+      exclude(group="us.ihmc", module="euclid-shape")
+      exclude(group="us.ihmc", module="euclid-frame")
+      }
 }
 
 testDependencies {

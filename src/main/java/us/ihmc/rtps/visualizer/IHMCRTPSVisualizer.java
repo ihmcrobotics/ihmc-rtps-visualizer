@@ -17,13 +17,13 @@ package us.ihmc.rtps.visualizer;
 
 import java.io.IOException;
 
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import us.ihmc.javafx.ApplicationNoModule;
 
-public class IHMCRTPSVisualizer extends Application
+public class IHMCRTPSVisualizer extends ApplicationNoModule 
 {
    @Override
    public void start(Stage stage) throws IOException
